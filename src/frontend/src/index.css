@@ -1,0 +1,138 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --radius: 0.75rem;
+        
+        /* Car Price Prediction Color Palette - Tech & Data Science Theme */
+        --ml-primary: 0.55 0.22 250;
+        --ml-accent: 0.65 0.20 210;
+        --ml-secondary: 0.60 0.18 270;
+        --ml-success: 0.65 0.16 160;
+        
+        /* Light Mode */
+        --background: 0.98 0 0;
+        --foreground: 0.15 0.02 250;
+        --card: 1 0 0;
+        --card-foreground: 0.15 0.02 250;
+        --popover: 1 0 0;
+        --popover-foreground: 0.15 0.02 250;
+        --primary: 0.55 0.22 250;
+        --primary-foreground: 1 0 0;
+        --secondary: 0.94 0.01 250;
+        --secondary-foreground: 0.15 0.02 250;
+        --muted: 0.96 0.01 250;
+        --muted-foreground: 0.48 0.02 250;
+        --accent: 0.65 0.20 210;
+        --accent-foreground: 1 0 0;
+        --destructive: 0.58 0.24 27;
+        --destructive-foreground: 1 0 0;
+        --border: 0.88 0.01 250;
+        --input: 0.88 0.01 250;
+        --ring: 0.55 0.22 250;
+        --chart-1: 0.55 0.22 250;
+        --chart-2: 0.65 0.20 210;
+        --chart-3: 0.60 0.18 270;
+        --chart-4: 0.65 0.16 160;
+        --chart-5: 0.70 0.18 200;
+    }
+
+    .dark {
+        --background: 0.12 0.02 250;
+        --foreground: 0.98 0 0;
+        --card: 0.16 0.02 250;
+        --card-foreground: 0.98 0 0;
+        --popover: 0.16 0.02 250;
+        --popover-foreground: 0.98 0 0;
+        --primary: 0.60 0.24 250;
+        --primary-foreground: 0.12 0.02 250;
+        --secondary: 0.20 0.03 250;
+        --secondary-foreground: 0.98 0 0;
+        --muted: 0.20 0.03 250;
+        --muted-foreground: 0.65 0.02 250;
+        --accent: 0.68 0.22 210;
+        --accent-foreground: 0.98 0 0;
+        --destructive: 0.62 0.22 27;
+        --destructive-foreground: 0.98 0 0;
+        --border: 0.24 0.03 250;
+        --input: 0.24 0.03 250;
+        --ring: 0.60 0.24 250;
+        --chart-1: 0.60 0.24 250;
+        --chart-2: 0.68 0.22 210;
+        --chart-3: 0.63 0.20 270;
+        --chart-4: 0.68 0.18 160;
+        --chart-5: 0.73 0.20 200;
+    }
+
+    * {
+        @apply border-border;
+    }
+    
+    body {
+        @apply bg-background text-foreground;
+        font-feature-settings: "rlig" 1, "calt" 1;
+    }
+}
+
+@layer utilities {
+    /* Custom animations */
+    @keyframes fade-in {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes fade-in-up {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-fade-in {
+        animation: fade-in 0.6s ease-out;
+    }
+
+    .animate-fade-in-up {
+        animation: fade-in-up 0.8s ease-out;
+    }
+
+    .delay-200 {
+        animation-delay: 0.2s;
+        animation-fill-mode: backwards;
+    }
+
+    .delay-300 {
+        animation-delay: 0.3s;
+        animation-fill-mode: backwards;
+    }
+
+    .delay-400 {
+        animation-delay: 0.4s;
+        animation-fill-mode: backwards;
+    }
+
+    .delay-500 {
+        animation-delay: 0.5s;
+        animation-fill-mode: backwards;
+    }
+
+    .delay-700 {
+        animation-delay: 0.7s;
+        animation-fill-mode: backwards;
+    }
+
+    .delay-1000 {
+        animation-delay: 1s;
+        animation-fill-mode: backwards;
+    }
+}

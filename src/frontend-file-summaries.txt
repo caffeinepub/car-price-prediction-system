@@ -1,0 +1,19 @@
+{
+  "frontend/src/App.tsx": "Main application component with authentication flow, profile setup, prediction form routing, and React Query provider integration for the car price prediction system.",
+  "frontend/src/components/Header.tsx": "Fixed navigation header with car price prediction branding, authentication status, user profile display, prediction tool access button, and logout functionality.",
+  "frontend/src/components/Hero.tsx": "Hero section showcasing the ML-powered car price prediction system with animated background, feature highlights for ML algorithms and forecasting, and call-to-action elements.",
+  "frontend/src/components/About.tsx": "About section displaying the car price prediction project overview, ML methodology, founder information (ASWIN S NAIR), contact email, and core technology features.",
+  "frontend/src/components/Products.tsx": "Products showcase with a new \"Trending Dress\" section highlighting curated fashion items (streetwear hoodie, branded t-shirt, fashion accessories) with enhanced styling, followed by tabbed interface displaying food and fashion collections.",
+  "frontend/src/components/Footer.tsx": "Footer component with car price prediction branding, founder information, contact email, social media links, and attribution.",
+  "frontend/src/hooks/useQueries.ts": "React Query hooks for user profiles, contact info, car price prediction, and prediction history management with proper error handling.",
+  "frontend/src/index.css": "Global styles with OKLCH color system featuring modern tech blues and purples for the car price prediction ML theme with custom animations.",
+  "frontend/tailwind.config.js": "Tailwind configuration extended with professional blue/purple color tokens and custom utilities for the car price prediction theme.",
+  "frontend/src/components/PredictionForm.tsx": "Comprehensive car price prediction form with 100+ car brands, input fields for vehicle details including new yearOfPurchase and usageDuration fields, ML-based price calculation with current value and future depreciation projections (1, 3, and 5 years) displayed in Indian Rupees (₹) with proper Indian number formatting, vehicle details summary showing purchase year and usage duration, and responsive results display with proper validation for all fields.",
+  "frontend/src/components/LoginForm.tsx": "Internet Identity login form with car price prediction branding and user-friendly authentication interface.",
+  "frontend/src/components/ProfileSetup.tsx": "Profile setup form for new users to enter their name and email after first login.",
+  "frontend/src/components/AdminDashboard.tsx": "Admin dashboard displaying active users, user activity statistics, login history, and comprehensive user management tables.",
+  "frontend/index.html": "HTML entry point with comprehensive SEO meta tags including title, description, keywords, Open Graph, Twitter cards, and canonical URL for the car price prediction system.",
+  "frontend/public/sitemap.xml": "XML sitemap for search engine crawlers listing all main pages with priorities and update frequencies.",
+  "frontend/public/robots.txt": "Robots.txt file allowing all search engines to crawl the site with sitemap reference and crawl-delay settings.",
+  "frontend/src/components/SEOHead.tsx": "React component that injects JSON-LD structured data for the car price prediction system including application information, founder details, and feature list."
+}
