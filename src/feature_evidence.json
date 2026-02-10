@@ -2,10 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-publish-the-current-build-latest-draft-to-production-so-the-live-production-url-serves-the-same-functionality-as-the-draft-build",
-      "featureTitle": "Publish the current build (latest draft) to production so the live production URL serves the same functionality as the draft build.",
+      "featureId": "feature-populate-frontend-public-robots-txt-with-crawler-rules-that-allow-indexing-and-include-a-sitemap-directive-pointing-to-sitemap-xml",
+      "featureTitle": "Populate frontend/public/robots.txt with crawler rules that allow indexing and include a Sitemap directive pointing to /sitemap.xml.",
       "files": [
-        "frontend/PRODUCTION_DEPLOYMENT.md"
+        "frontend/public/robots.txt"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -18,6 +18,44 @@
       ],
       "testIds": [
         "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-populate-frontend-public-sitemap-xml-with-a-valid-xml-sitemap-that-lists-the-public-urls-that-should-be-indexed-at-minimum-the-site-root",
+      "featureTitle": "Populate frontend/public/sitemap.xml with a valid XML sitemap that lists the public URLs that should be indexed (at minimum the site root).",
+      "files": [
+        "frontend/public/sitemap.xml"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "blob-storage@4.0.0",
+        "authorization@4.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-ensure-the-seo-images-referenced-by-the-app-exist-as-static-assets-under-frontend-public-assets-generated-using-the-exact-filenames-already-referenced-in-the-codebase",
+      "featureTitle": "Ensure the SEO images referenced by the app exist as static assets under frontend/public/assets/generated using the exact filenames already referenced in the codebase.",
+      "files": [],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "blob-storage@4.0.0",
+        "authorization@4.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
       ],
       "confidence": "high"
     }

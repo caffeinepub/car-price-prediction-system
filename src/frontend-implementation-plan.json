@@ -1,21 +1,63 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Publish current app build to production (frontend-only)",
+  "title": "Enable indexing via robots.txt and sitemap.xml and ensure SEO image assets exist",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Document and standardize the production publish process for the current frontend build without changing app features or behavior.",
+      "summary": "Add crawler-friendly rules to robots.txt allowing indexing and pointing to /sitemap.xml.",
       "acceptanceCriteria": [
-        "A production deployment is triggered and completes successfully.",
-        "Visiting the production URL loads the app without errors.",
-        "Core user flow remains functional in production (Internet Identity login, profile setup, car price prediction submission, and viewing prediction history)."
+        "GET /robots.txt returns plain text (not empty).",
+        "robots.txt includes at least: `User-agent: *`, an `Allow` directive (or no Disallow that blocks all), and `Sitemap: <origin>/sitemap.xml` (may use relative `/sitemap.xml`).",
+        "robots.txt does not disallow `/` (site-wide block)."
       ],
       "file_operations": [
         {
-          "path": "frontend/PRODUCTION_DEPLOYMENT.md",
+          "path": "frontend/public/robots.txt",
+          "operation": "modify",
+          "description": "Populate robots.txt with permissive crawling rules (e.g., `User-agent: *`, allow indexing) and include a `Sitemap: /sitemap.xml` directive."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Create a valid XML sitemap listing indexable public URLs (minimum homepage) matching the app’s canonical origin.",
+      "acceptanceCriteria": [
+        "GET /sitemap.xml returns valid XML (not empty) with a `<urlset>` root element.",
+        "Sitemap contains at least one `<url>` entry for the homepage.",
+        "Sitemap URLs use the same public origin as the canonical URL used by the app (or are provided as relative URLs if supported by the sitemap generator approach used)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/public/sitemap.xml",
+          "operation": "modify",
+          "description": "Populate sitemap.xml as a valid XML sitemap with a `<urlset>` root and at least one `<url>` entry for the homepage, using the same public origin as the canonical URL defined in frontend/index.html (or relative URLs if chosen)."
+        },
+        {
+          "path": "frontend/index.html",
+          "operation": "modify",
+          "description": "Verify the canonical URL is correct for the intended production origin so sitemap URLs can match it; adjust only if currently incorrect."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Ensure required social/hero SEO images exist under frontend/public/assets/generated with exact referenced filenames.",
+      "acceptanceCriteria": [
+        "`/assets/generated/ml-car-prediction.dim_800x400.jpg` exists in frontend/public/assets/generated and loads in the browser.",
+        "`/assets/generated/car-showroom-hero.dim_1200x600.jpg` exists in frontend/public/assets/generated and loads in the browser.",
+        "The homepage Hero image renders without broken-image placeholders."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/public/assets/generated/ml-car-prediction.dim_800x400.jpg",
           "operation": "create",
-          "description": "Add a production release checklist and deployment notes for publishing the existing build (no feature/behavior changes), including verification steps for the core user flow and references to the repo’s export/deploy tooling. Use the github-export-icp-cli component/templates to support repeatable production publishing; Verify the component's usage instructions before implementing."
+          "description": "Add the static SEO/social preview image asset at this exact path/filename so it matches references in frontend/index.html."
+        },
+        {
+          "path": "frontend/public/assets/generated/car-showroom-hero.dim_1200x600.jpg",
+          "operation": "create",
+          "description": "Add the static homepage hero image asset at this exact path/filename so it matches references in frontend/src/components/Hero.tsx."
         }
       ]
     }

@@ -1,46 +1,77 @@
 {
   "kind": "build_request",
-  "title": "Publish current app to production",
-  "priority": "normal",
+  "title": "Enable Google indexing (robots.txt + sitemap.xml) and ensure SEO assets exist",
+  "priority": "high",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Publish the current build (latest draft) to production so the live production URL serves the same functionality as the draft build.",
-      "target": "unknown",
+      "text": "Populate frontend/public/robots.txt with crawler rules that allow indexing and include a Sitemap directive pointing to /sitemap.xml.",
+      "target": "frontend",
       "source": {
         "messageIds": [
           "msg-user-1"
         ],
         "quotes": [
-          "publish it"
+          "publish it fastly then i can search in goolgle also or not"
         ]
       },
       "acceptanceCriteria": [
-        "A production deployment is triggered and completes successfully.",
-        "Visiting the production URL loads the app without errors.",
-        "Core user flow remains functional in production (Internet Identity login, profile setup, car price prediction submission, and viewing prediction history)."
+        "GET /robots.txt returns plain text (not empty).",
+        "robots.txt includes at least: `User-agent: *`, an `Allow` directive (or no Disallow that blocks all), and `Sitemap: <origin>/sitemap.xml` (may use relative `/sitemap.xml`).",
+        "robots.txt does not disallow `/` (site-wide block)."
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Populate frontend/public/sitemap.xml with a valid XML sitemap that lists the public URLs that should be indexed (at minimum the site root).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-user-1"
+        ],
+        "quotes": [
+          "publish it fastly then i can search in goolgle also or not"
+        ]
+      },
+      "acceptanceCriteria": [
+        "GET /sitemap.xml returns valid XML (not empty) with a `<urlset>` root element.",
+        "Sitemap contains at least one `<url>` entry for the homepage.",
+        "Sitemap URLs use the same public origin as the canonical URL used by the app (or are provided as relative URLs if supported by the sitemap generator approach used)."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Ensure the SEO images referenced by the app exist as static assets under frontend/public/assets/generated using the exact filenames already referenced in the codebase.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-user-1"
+        ],
+        "quotes": [
+          "publish it fastly then i can search in goolgle also or not"
+        ]
+      },
+      "acceptanceCriteria": [
+        "`/assets/generated/ml-car-prediction.dim_800x400.jpg` exists in frontend/public/assets/generated and loads in the browser.",
+        "`/assets/generated/car-showroom-hero.dim_1200x600.jpg` exists in frontend/public/assets/generated and loads in the browser.",
+        "The homepage Hero image renders without broken-image placeholders."
       ]
     }
   ],
   "constraints": [
-    "Do not modify application features or behavior as part of this request; this is a publish-only action."
+    "Do not edit files in frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or anything under frontend/src/components/ui.",
+    "Backend must remain a single Motoko actor in backend/main.mo; only add migration.mo if persistent state shape changes (not expected for this request)."
   ],
   "nonGoals": [
-    "Adding new fields or changing the car price prediction logic.",
-    "UI/UX redesign or new pages/components."
+    "Guaranteeing Google ranking position or index time (indexing depends on Google and the final public domain).",
+    "Adding third-party analytics, Google Search Console verification, or external SEO services integrations.",
+    "Changing prediction logic or backend data models."
   ],
   "imageRequirements": {
-    "required": [],
+    "required": [
+      "Wide hero banner illustration of a modern car showroom with subtle ML/data overlay (car-showroom-hero.dim_1200x600.jpg)",
+      "Social share preview image with a car silhouette and abstract chart/ML motifs (ml-car-prediction.dim_800x400.jpg)"
+    ],
     "edits": []
-  },
-  "userProfileUpdate": {
-    "goalsToAdd": [],
-    "goalsToRemove": [],
-    "preferencesToAdd": [],
-    "preferencesToRemove": [],
-    "miscToAdd": [],
-    "miscToRemove": [],
-    "fieldsToSet": {},
-    "fieldsToDelete": []
   }
 }

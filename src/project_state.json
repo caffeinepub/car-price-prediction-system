@@ -1,22 +1,55 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "New project",
-  "architectural_notes": [],
+  "summary": "Car price prediction system; user is creating cartoon-style ads and wants to publish it so it can be searchable on Google.",
+  "architectural_notes": [
+    "Plan for public deployment with a stable URL/domain so the app can be indexed by search engines.",
+    "Add SEO/indexing basics (robots.txt, sitemap.xml, indexable pages/meta) to support Google discoverability."
+  ],
   "known_issues": [],
   "isFixRequest": false,
+  "imageRequirements": "## Required Images\n- Wide hero banner illustration of a modern car showroom with subtle ML/data overlay (car-showroom-hero.dim_1200x600.jpg)\n- Social share preview image with a car silhouette and abstract chart/ML motifs (ml-car-prediction.dim_800x400.jpg)",
   "existing_features": [
     {
-      "id": "feature-publish-the-current-build-latest-draft-to-production-so-the-live-production-url-serves-the-same-functionality-as-the-draft-build",
-      "title": "Publish the current build (latest draft) to production so the live production URL serves the same functionality as the draft build.",
+      "id": "feature-populate-frontend-public-robots-txt-with-crawler-rules-that-allow-indexing-and-include-a-sitemap-directive-pointing-to-sitemap-xml",
+      "title": "Populate frontend/public/robots.txt with crawler rules that allow indexing and include a Sitemap directive pointing to /sitemap.xml.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-populate-frontend-public-sitemap-xml-with-a-valid-xml-sitemap-that-lists-the-public-urls-that-should-be-indexed-at-minimum-the-site-root",
+      "title": "Populate frontend/public/sitemap.xml with a valid XML sitemap that lists the public URLs that should be indexed (at minimum the site root).",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-the-seo-images-referenced-by-the-app-exist-as-static-assets-under-frontend-public-assets-generated-using-the-exact-filenames-already-referenced-in-the-codebase",
+      "title": "Ensure the SEO images referenced by the app exist as static assets under frontend/public/assets/generated using the exact filenames already referenced in the codebase.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
     }
   ],
-  "new_feature_requests": [],
-  "projectName": "Publish current app to production",
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Publish/deploy the car price prediction system publicly (production release)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Enable Google search visibility (SEO + indexing via domain/public URL, sitemap/robots)",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "projectName": "Enable Google indexing (robots.txt + sitemap.xml) and ensure SEO assets exist",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }
