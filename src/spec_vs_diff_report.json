@@ -1,0 +1,57 @@
+{
+  "kind": "spec_vs_diff_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-08T04:42:13.815Z",
+  "summary": "BuildRequest REQ-1 is a publish-only production deployment with no feature/behavior changes. The diff does not show any deployment trigger/configuration changes, but it does include backend and auth-hook modifications plus documentation and summaries that describe multiple new/changed frontend features, which violates the publish-only constraint.",
+  "missing_requirements": [
+    {
+      "id": "REQ-1",
+      "requirement": "Publish the current build (latest draft) to production so the live production URL serves the same functionality as the draft build.",
+      "reason": "The diff shows added documentation (a deployment guide) but does not include evidence of an actual production deployment being triggered/completing (e.g., CI/CD workflow changes, deployment scripts, environment/prod config updates).",
+      "evidence": [
+        "frontend/PRODUCTION_DEPLOYMENT.md",
+        "project_state.json"
+      ]
+    }
+  ],
+  "hallucinated_features": [
+    {
+      "description": "Changes to car price prediction logic/data model (e.g., introducing yearOfPurchase/usageDuration validations and extended result structure such as breakdown/adjustments).",
+      "reason": "BuildRequest explicitly constrains this to a publish-only action and lists as non-goals: adding fields or changing the car price prediction logic. The diff modifies backend prediction types and validation logic.",
+      "evidence": [
+        "backend/main.mo",
+        "frontend-file-summaries.txt"
+      ]
+    },
+    {
+      "description": "Modifications to Internet Identity authentication hook behavior/configuration.",
+      "reason": "Publish-only request prohibits behavior changes; diff includes substantive edits to the II hook (AuthClient creation/options, status handling, etc.).",
+      "evidence": [
+        "frontend/src/hooks/useInternetIdentity.ts"
+      ]
+    },
+    {
+      "description": "New/changed UI content unrelated to car price prediction (e.g., \"Trending Dress\" fashion products section) and other new pages/components (e.g., AdminDashboard, SEOHead, sitemap/robots, expanded SEO metadata).",
+      "reason": "Non-goals include UI/UX redesign or new pages/components; these items are described as present in the frontend summaries but are not requested by REQ-1.",
+      "evidence": [
+        "frontend-file-summaries.txt"
+      ]
+    },
+    {
+      "description": "Addition of production deployment documentation and project state tracking files.",
+      "reason": "REQ-1 requests an actual production publish; adding docs/state files is not part of the requested functional deliverable and does not itself fulfill deployment.",
+      "evidence": [
+        "frontend/PRODUCTION_DEPLOYMENT.md",
+        "project_state.json"
+      ]
+    }
+  ],
+  "confidence": 0.74,
+  "changed_files": [
+    "backend/main.mo",
+    "frontend-file-summaries.txt",
+    "frontend/PRODUCTION_DEPLOYMENT.md",
+    "frontend/src/hooks/useInternetIdentity.ts",
+    "project_state.json"
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Publish current app build to production (frontend-only)",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "summary": "Document and standardize the production publish process for the current frontend build without changing app features or behavior.",
+      "acceptanceCriteria": [
+        "A production deployment is triggered and completes successfully.",
+        "Visiting the production URL loads the app without errors.",
+        "Core user flow remains functional in production (Internet Identity login, profile setup, car price prediction submission, and viewing prediction history)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/PRODUCTION_DEPLOYMENT.md",
+          "operation": "create",
+          "description": "Add a production release checklist and deployment notes for publishing the existing build (no feature/behavior changes), including verification steps for the core user flow and references to the repo’s export/deploy tooling. Use the github-export-icp-cli component/templates to support repeatable production publishing; Verify the component's usage instructions before implementing."
+        }
+      ]
+    }
+  ]
+}

@@ -15,5 +15,6 @@
   "frontend/index.html": "HTML entry point with comprehensive SEO meta tags including title, description, keywords, Open Graph, Twitter cards, and canonical URL for the car price prediction system.",
   "frontend/public/sitemap.xml": "XML sitemap for search engine crawlers listing all main pages with priorities and update frequencies.",
   "frontend/public/robots.txt": "Robots.txt file allowing all search engines to crawl the site with sitemap reference and crawl-delay settings.",
-  "frontend/src/components/SEOHead.tsx": "React component that injects JSON-LD structured data for the car price prediction system including application information, founder details, and feature list."
+  "frontend/src/components/SEOHead.tsx": "React component that injects JSON-LD structured data for the car price prediction system including application information, founder details, and feature list.",
+  "frontend/PRODUCTION_DEPLOYMENT.md": "Comprehensive production deployment guide with pre-deployment checklist, core user flow verification steps, deployment procedures, rollback instructions, and monitoring guidelines for the Car Price Prediction System on the Internet Computer."
 }

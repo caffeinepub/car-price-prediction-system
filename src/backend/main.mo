@@ -10,9 +10,7 @@ import Runtime "mo:core/Runtime";
 import MixinAuthorization "authorization/MixinAuthorization";
 import MixinStorage "blob-storage/Mixin";
 import AccessControl "authorization/access-control";
-import Migration "migration";
 
-(with migration = Migration.run)
 actor {
   // Integrate file storage functionality
   include MixinStorage();
@@ -315,11 +313,8 @@ actor {
     { founder = "Founder: ASWIN S NAIR"; contactEmail = "aswinjr462005@gmail.com" };
   };
 
-  // Admin check (requires authentication)
+  // Admin check (public - anyone can check if they are admin)
   public shared ({ caller }) func isAdmin() : async Bool {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can check admin status");
-    };
     AccessControl.isAdmin(accessControlState, caller);
   };
 
@@ -347,11 +342,8 @@ actor {
     "Logged in successfully as: " # caller.toText();
   };
 
-  // Logout function (requires authentication)
+  // Logout function (public - anyone can logout)
   public shared ({ caller }) func logout() : async Text {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can logout");
-    };
     "User successfully signed out";
   };
 

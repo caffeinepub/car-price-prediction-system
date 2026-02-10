@@ -1,0 +1,46 @@
+{
+  "kind": "build_request",
+  "title": "Publish current app to production",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "text": "Publish the current build (latest draft) to production so the live production URL serves the same functionality as the draft build.",
+      "target": "unknown",
+      "source": {
+        "messageIds": [
+          "msg-user-1"
+        ],
+        "quotes": [
+          "publish it"
+        ]
+      },
+      "acceptanceCriteria": [
+        "A production deployment is triggered and completes successfully.",
+        "Visiting the production URL loads the app without errors.",
+        "Core user flow remains functional in production (Internet Identity login, profile setup, car price prediction submission, and viewing prediction history)."
+      ]
+    }
+  ],
+  "constraints": [
+    "Do not modify application features or behavior as part of this request; this is a publish-only action."
+  ],
+  "nonGoals": [
+    "Adding new fields or changing the car price prediction logic.",
+    "UI/UX redesign or new pages/components."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
+  }
+}
