@@ -1,63 +1,46 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Enable indexing via robots.txt and sitemap.xml and ensure SEO image assets exist",
+  "title": "Developer documentation and required generated static assets",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Add crawler-friendly rules to robots.txt allowing indexing and pointing to /sitemap.xml.",
+      "summary": "Add English developer documentation describing project structure, entry files, and local/deployment workflows for frontend and IC canister.",
       "acceptanceCriteria": [
-        "GET /robots.txt returns plain text (not empty).",
-        "robots.txt includes at least: `User-agent: *`, an `Allow` directive (or no Disallow that blocks all), and `Sitemap: <origin>/sitemap.xml` (may use relative `/sitemap.xml`).",
-        "robots.txt does not disallow `/` (site-wide block)."
+        "A new root documentation file exists (e.g., README.md) that explicitly points to backend/main.mo as the backend entry point and frontend/src/App.tsx as the frontend app entry point.",
+        "Documentation includes local development steps for the frontend (install dependencies, run dev server) and for the IC canister (dfx start/deploy workflow), referencing the existing frontend/PRODUCTION_DEPLOYMENT.md where appropriate.",
+        "Documentation is written in English and includes a brief high-level directory tree (frontend vs backend) so a user can locate code quickly."
       ],
       "file_operations": [
         {
-          "path": "frontend/public/robots.txt",
+          "path": "frontend/README.md",
+          "operation": "create",
+          "description": "Create developer documentation in English that explains where frontend/ and backend/ code lives, calls out frontend/src/App.tsx and backend/main.mo as main entry files, includes a brief directory tree, and documents local run steps (frontend dev server + dfx workflow) while referencing frontend/PRODUCTION_DEPLOYMENT.md for production deployment details."
+        },
+        {
+          "path": "frontend/PRODUCTION_DEPLOYMENT.md",
           "operation": "modify",
-          "description": "Populate robots.txt with permissive crawling rules (e.g., `User-agent: *`, allow indexing) and include a `Sitemap: /sitemap.xml` directive."
+          "description": "Add a short section/link pointing developers to frontend/README.md for project structure and entry-file orientation, keeping all added/modified user-facing text in English."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Create a valid XML sitemap listing indexable public URLs (minimum homepage) matching the app’s canonical origin.",
+      "summary": "Ensure referenced SEO/static images exist under frontend/public/assets/generated with the exact filenames used by the app.",
       "acceptanceCriteria": [
-        "GET /sitemap.xml returns valid XML (not empty) with a `<urlset>` root element.",
-        "Sitemap contains at least one `<url>` entry for the homepage.",
-        "Sitemap URLs use the same public origin as the canonical URL used by the app (or are provided as relative URLs if supported by the sitemap generator approach used)."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/public/sitemap.xml",
-          "operation": "modify",
-          "description": "Populate sitemap.xml as a valid XML sitemap with a `<urlset>` root and at least one `<url>` entry for the homepage, using the same public origin as the canonical URL defined in frontend/index.html (or relative URLs if chosen)."
-        },
-        {
-          "path": "frontend/index.html",
-          "operation": "modify",
-          "description": "Verify the canonical URL is correct for the intended production origin so sitemap URLs can match it; adjust only if currently incorrect."
-        }
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "summary": "Ensure required social/hero SEO images exist under frontend/public/assets/generated with exact referenced filenames.",
-      "acceptanceCriteria": [
-        "`/assets/generated/ml-car-prediction.dim_800x400.jpg` exists in frontend/public/assets/generated and loads in the browser.",
-        "`/assets/generated/car-showroom-hero.dim_1200x600.jpg` exists in frontend/public/assets/generated and loads in the browser.",
-        "The homepage Hero image renders without broken-image placeholders."
+        "The files /assets/generated/ml-car-prediction.dim_800x400.jpg and /assets/generated/car-showroom-hero.dim_1200x600.jpg exist in frontend/public/assets/generated.",
+        "The app loads without broken image links where /assets/generated/ml-car-prediction.dim_800x400.jpg is used (e.g., in frontend/src/components/LoginForm.tsx and frontend/index.html)."
       ],
       "file_operations": [
         {
           "path": "frontend/public/assets/generated/ml-car-prediction.dim_800x400.jpg",
           "operation": "create",
-          "description": "Add the static SEO/social preview image asset at this exact path/filename so it matches references in frontend/index.html."
+          "description": "Add the required social share/SEO preview image asset at frontend/public/assets/generated/ml-car-prediction.dim_800x400.jpg so existing references (e.g., frontend/index.html and frontend/src/components/LoginForm.tsx) resolve without broken links."
         },
         {
           "path": "frontend/public/assets/generated/car-showroom-hero.dim_1200x600.jpg",
           "operation": "create",
-          "description": "Add the static homepage hero image asset at this exact path/filename so it matches references in frontend/src/components/Hero.tsx."
+          "description": "Add the required wide hero banner image asset at frontend/public/assets/generated/car-showroom-hero.dim_1200x600.jpg so the existing Hero image reference resolves without broken links."
         }
       ]
     }

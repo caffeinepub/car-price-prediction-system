@@ -16,5 +16,6 @@
   "frontend/public/sitemap.xml": "Valid XML sitemap with homepage URL entry using the canonical domain, last modified date, change frequency, and priority for search engine indexing.",
   "frontend/public/robots.txt": "Crawler-friendly robots.txt allowing all search engines to index the site with sitemap reference and crawl-delay settings.",
   "frontend/src/components/SEOHead.tsx": "React component that injects JSON-LD structured data for the car price prediction system including application information, founder details, and feature list.",
-  "frontend/PRODUCTION_DEPLOYMENT.md": "Comprehensive production deployment guide with pre-deployment checklist, core user flow verification steps, deployment procedures, rollback instructions, and monitoring guidelines for the Car Price Prediction System on the Internet Computer."
+  "frontend/PRODUCTION_DEPLOYMENT.md": "Production deployment guide with pre-deployment checklist, deployment steps, post-deployment verification, rollback procedures, and monitoring guidelines, now includes a reference link to README.md for project structure and local development setup.",
+  "frontend/README.md": "Comprehensive English developer documentation explaining project structure, entry points (backend/main.mo and frontend/src/App.tsx), local development setup with dfx workflow, architecture overview, and quick reference for common development tasks."
 }

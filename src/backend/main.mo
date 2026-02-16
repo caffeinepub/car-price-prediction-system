@@ -355,3 +355,4 @@ actor {
     AccessControl.assignRole(accessControlState, caller, user, role);
   };
 };
+

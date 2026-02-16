@@ -1,41 +1,31 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-10T13:25:45.508Z",
+  "generatedAt": "2026-02-16T03:57:10.784Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 3,
-    "implemented": 3,
+    "total": 2,
+    "implemented": 2,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Populate frontend/public/robots.txt with crawler rules that allow indexing and include a Sitemap directive pointing to /sitemap.xml.",
+        "summary": "Add a root-level developer documentation file that clearly explains where the frontend and backend source code lives in this project, highlights the main entry files, and documents how to run the app locally and how to deploy it on the Internet Computer.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/public/robots.txt"
+          "frontend/README.md",
+          "frontend/PRODUCTION_DEPLOYMENT.md"
         ],
         "matchedFiles": [
-          "frontend/public/robots.txt"
+          "frontend/README.md",
+          "frontend/PRODUCTION_DEPLOYMENT.md"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Populate frontend/public/sitemap.xml with a valid XML sitemap that lists the public URLs that should be indexed (at minimum the site root).",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/public/sitemap.xml",
-          "frontend/index.html"
-        ],
-        "matchedFiles": [
-          "frontend/public/sitemap.xml"
-        ]
-      },
-      {
-        "id": "REQ-3",
-        "summary": "Ensure the SEO images referenced by the app exist as static assets under frontend/public/assets/generated using the exact filenames already referenced in the codebase.",
+        "summary": "Ensure the SEO/static images referenced by the frontend exist as static assets under frontend/public/assets/generated using the exact filenames already referenced in the codebase.",
         "status": "implemented",
         "plannedFiles": [
           "frontend/public/assets/generated/ml-car-prediction.dim_800x400.jpg",
@@ -49,15 +39,15 @@
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
     "build-request.json",
-    "caffeine.lock.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
+    "frontend/PRODUCTION_DEPLOYMENT.md",
+    "frontend/README.md",
     "frontend/public/assets/generated/car-showroom-hero.dim_1200x600.jpg",
     "frontend/public/assets/generated/ml-car-prediction.dim_800x400.jpg",
-    "frontend/public/robots.txt",
-    "frontend/public/sitemap.xml",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

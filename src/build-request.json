@@ -1,71 +1,53 @@
 {
   "kind": "build_request",
-  "title": "Enable Google indexing (robots.txt + sitemap.xml) and ensure SEO assets exist",
-  "priority": "high",
+  "title": "Provide the full website source code structure (frontend + backend) with developer documentation and required static assets",
+  "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Populate frontend/public/robots.txt with crawler rules that allow indexing and include a Sitemap directive pointing to /sitemap.xml.",
-      "target": "frontend",
+      "text": "Add a root-level developer documentation file that clearly explains where the frontend and backend source code lives in this project, highlights the main entry files, and documents how to run the app locally and how to deploy it on the Internet Computer.",
+      "target": "both",
       "source": {
         "messageIds": [
-          "msg-user-1"
+          "msg-7"
         ],
         "quotes": [
-          "publish it fastly then i can search in goolgle also or not"
+          "give me code of  the website like front end and backends"
         ]
       },
       "acceptanceCriteria": [
-        "GET /robots.txt returns plain text (not empty).",
-        "robots.txt includes at least: `User-agent: *`, an `Allow` directive (or no Disallow that blocks all), and `Sitemap: <origin>/sitemap.xml` (may use relative `/sitemap.xml`).",
-        "robots.txt does not disallow `/` (site-wide block)."
+        "A new root documentation file exists (e.g., README.md) that explicitly points to backend/main.mo as the backend entry point and frontend/src/App.tsx as the frontend app entry point.",
+        "Documentation includes local development steps for the frontend (install dependencies, run dev server) and for the IC canister (dfx start/deploy workflow), referencing the existing frontend/PRODUCTION_DEPLOYMENT.md where appropriate.",
+        "Documentation is written in English and includes a brief high-level directory tree (frontend vs backend) so a user can locate code quickly."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Populate frontend/public/sitemap.xml with a valid XML sitemap that lists the public URLs that should be indexed (at minimum the site root).",
+      "text": "Ensure the SEO/static images referenced by the frontend exist as static assets under frontend/public/assets/generated using the exact filenames already referenced in the codebase.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-user-1"
+          "msg-7"
         ],
         "quotes": [
-          "publish it fastly then i can search in goolgle also or not"
+          "give me code of  the website like front end and backends"
         ]
       },
       "acceptanceCriteria": [
-        "GET /sitemap.xml returns valid XML (not empty) with a `<urlset>` root element.",
-        "Sitemap contains at least one `<url>` entry for the homepage.",
-        "Sitemap URLs use the same public origin as the canonical URL used by the app (or are provided as relative URLs if supported by the sitemap generator approach used)."
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "text": "Ensure the SEO images referenced by the app exist as static assets under frontend/public/assets/generated using the exact filenames already referenced in the codebase.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-user-1"
-        ],
-        "quotes": [
-          "publish it fastly then i can search in goolgle also or not"
-        ]
-      },
-      "acceptanceCriteria": [
-        "`/assets/generated/ml-car-prediction.dim_800x400.jpg` exists in frontend/public/assets/generated and loads in the browser.",
-        "`/assets/generated/car-showroom-hero.dim_1200x600.jpg` exists in frontend/public/assets/generated and loads in the browser.",
-        "The homepage Hero image renders without broken-image placeholders."
+        "The files /assets/generated/ml-car-prediction.dim_800x400.jpg and /assets/generated/car-showroom-hero.dim_1200x600.jpg exist in frontend/public/assets/generated.",
+        "The app loads without broken image links where /assets/generated/ml-car-prediction.dim_800x400.jpg is used (e.g., in frontend/src/components/LoginForm.tsx and frontend/index.html)."
       ]
     }
   ],
   "constraints": [
-    "Do not edit files in frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or anything under frontend/src/components/ui.",
-    "Backend must remain a single Motoko actor in backend/main.mo; only add migration.mo if persistent state shape changes (not expected for this request)."
+    "Backend must remain a single Motoko actor in backend/main.mo; do not introduce additional backend services.",
+    "Do not modify files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or anything inside frontend/src/components/ui (compose instead).",
+    "User-facing text added/modified by this request must be in English."
   ],
   "nonGoals": [
-    "Guaranteeing Google ranking position or index time (indexing depends on Google and the final public domain).",
-    "Adding third-party analytics, Google Search Console verification, or external SEO services integrations.",
-    "Changing prediction logic or backend data models."
+    "Adding new product features beyond documentation and ensuring referenced static assets exist.",
+    "Implementing third-party auth providers other than Internet Identity.",
+    "Adding external databases or non-Motoko backend services."
   ],
   "imageRequirements": {
     "required": [

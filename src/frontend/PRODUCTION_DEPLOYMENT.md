@@ -2,6 +2,8 @@
 
 This document outlines the process for deploying the Car Price Prediction System to production on the Internet Computer.
 
+> **📖 For project structure and local development setup, see [README.md](./README.md)**
+
 ## Prerequisites
 
 - DFX CLI installed and configured
@@ -74,3 +76,4 @@ Before deploying to production, verify the following user flows work correctly:
 ## Deployment Steps
 
 ### Step 1: Build Frontend
+
