@@ -1,0 +1,153 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --radius: 0.75rem;
+        
+        /* Music Theme - Warm & Vibrant Colors */
+        --music-warm: 0.65 0.20 35;
+        --music-glow: 0.70 0.22 50;
+        --music-vibrant: 0.60 0.24 340;
+        --music-accent: 0.75 0.18 120;
+        
+        /* Light Mode */
+        --background: 0.98 0 0;
+        --foreground: 0.15 0.02 35;
+        --card: 1 0 0;
+        --card-foreground: 0.15 0.02 35;
+        --popover: 1 0 0;
+        --popover-foreground: 0.15 0.02 35;
+        --primary: 0.65 0.20 35;
+        --primary-foreground: 1 0 0;
+        --secondary: 0.94 0.01 35;
+        --secondary-foreground: 0.15 0.02 35;
+        --muted: 0.96 0.01 35;
+        --muted-foreground: 0.48 0.02 35;
+        --accent: 0.70 0.22 50;
+        --accent-foreground: 1 0 0;
+        --destructive: 0.58 0.24 27;
+        --destructive-foreground: 1 0 0;
+        --border: 0.88 0.01 35;
+        --input: 0.88 0.01 35;
+        --ring: 0.65 0.20 35;
+        --chart-1: 0.65 0.20 35;
+        --chart-2: 0.70 0.22 50;
+        --chart-3: 0.60 0.24 340;
+        --chart-4: 0.75 0.18 120;
+        --chart-5: 0.68 0.20 200;
+    }
+
+    .dark {
+        --background: 0.12 0.02 35;
+        --foreground: 0.98 0 0;
+        --card: 0.16 0.02 35;
+        --card-foreground: 0.98 0 0;
+        --popover: 0.16 0.02 35;
+        --popover-foreground: 0.98 0 0;
+        --primary: 0.70 0.22 35;
+        --primary-foreground: 0.12 0.02 35;
+        --secondary: 0.20 0.03 35;
+        --secondary-foreground: 0.98 0 0;
+        --muted: 0.20 0.03 35;
+        --muted-foreground: 0.65 0.02 35;
+        --accent: 0.75 0.24 50;
+        --accent-foreground: 0.98 0 0;
+        --destructive: 0.62 0.22 27;
+        --destructive-foreground: 0.98 0 0;
+        --border: 0.24 0.03 35;
+        --input: 0.24 0.03 35;
+        --ring: 0.70 0.22 35;
+        --chart-1: 0.70 0.22 35;
+        --chart-2: 0.75 0.24 50;
+        --chart-3: 0.65 0.26 340;
+        --chart-4: 0.78 0.20 120;
+        --chart-5: 0.73 0.22 200;
+    }
+
+    * {
+        @apply border-border;
+    }
+    
+    body {
+        @apply bg-background text-foreground;
+        font-feature-settings: "rlig" 1, "calt" 1;
+    }
+}
+
+@layer utilities {
+    /* Custom animations */
+    @keyframes fade-in {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes fade-in-up {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes pulse-glow {
+        0%, 100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+        50% {
+            opacity: 0.8;
+            transform: scale(1.05);
+        }
+    }
+
+    .animate-fade-in {
+        animation: fade-in 0.6s ease-out;
+    }
+
+    .animate-fade-in-up {
+        animation: fade-in-up 0.8s ease-out;
+    }
+
+    .animate-pulse-glow {
+        animation: pulse-glow 2s ease-in-out infinite;
+    }
+
+    .delay-200 {
+        animation-delay: 0.2s;
+        animation-fill-mode: backwards;
+    }
+
+    .delay-300 {
+        animation-delay: 0.3s;
+        animation-fill-mode: backwards;
+    }
+
+    .delay-400 {
+        animation-delay: 0.4s;
+        animation-fill-mode: backwards;
+    }
+
+    .delay-500 {
+        animation-delay: 0.5s;
+        animation-fill-mode: backwards;
+    }
+
+    .delay-700 {
+        animation-delay: 0.7s;
+        animation-fill-mode: backwards;
+    }
+
+    .delay-1000 {
+        animation-delay: 1s;
+        animation-fill-mode: backwards;
+    }
+}

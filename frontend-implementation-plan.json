@@ -1,0 +1,88 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Fix hand gesture piano functionality",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "summary": "Audit and fix the WebcamFeed component's hand tracking initialization to ensure MediaPipe Hands loads correctly, camera feed starts properly, and gesture detection events fire and propagate to the audio player without errors",
+      "acceptanceCriteria": [
+        "Webcam feed displays live camera output without a blank or frozen screen",
+        "MediaPipe Hands initializes without console errors",
+        "Hand landmarks are detected and drawn on the canvas overlay",
+        "Detected gestures correctly trigger note playback"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/WebcamFeed.tsx",
+          "operation": "modify",
+          "description": "Audit and fix the camera initialization logic: ensure the camera component from the camera hook is properly integrated, verify video element ref binding, check that the camera starts automatically or provides clear start controls, and confirm the video stream is active before initializing hand tracking. Add error handling for camera permission denials and unsupported browsers. Ensure the onGestureDetected callback is invoked with correct note data whenever a valid gesture is recognized."
+        },
+        {
+          "path": "frontend/src/hooks/useHandTracking.ts",
+          "operation": "modify",
+          "description": "Audit and fix MediaPipe Hands initialization: verify the Hands model loads from the correct CDN path, check that the onResults callback receives landmark data and draws it on the canvas overlay, ensure the video feed is processed continuously without frame drops, and confirm that detected hand landmarks are returned to the caller. Add console logging for initialization success/failure and frame processing errors."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Audit and fix the useAudioPlayer hook to ensure piano sample files load successfully for the full C4–C6 range (25 keys), with automatic fallback to oscillator synthesis if sample files fail to load",
+      "acceptanceCriteria": [
+        "Piano notes play audibly when a gesture is detected",
+        "No unhandled audio-context or sample-loading errors appear in the console",
+        "Fallback oscillator sounds play if sample files are unavailable",
+        "Multiple simultaneous notes can sound without audio glitches"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useAudioPlayer.ts",
+          "operation": "modify",
+          "description": "Audit and fix the audio loading and playback logic: verify that all 25 piano sample file paths are correct and accessible, add robust error handling for failed sample loads with automatic fallback to oscillator synthesis, ensure the AudioContext initializes on user interaction to avoid browser autoplay restrictions, confirm that playNote can handle multiple simultaneous notes without clipping or distortion, and implement proper volume control application. Add console logging for sample load success/failure and playback errors."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Audit and fix the gesture recognition utility (gestureRecognition.ts) to ensure landmark-to-note mapping works correctly for all 25 keys (C4–C6) and finger extension detection thresholds produce reliable note triggering",
+      "acceptanceCriteria": [
+        "Each of the 25 notes can be triggered by a distinct, reachable hand gesture",
+        "No notes fire continuously when the hand is at rest",
+        "Gesture-to-note mapping is consistent with the visual piano keyboard layout"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/utils/gestureRecognition.ts",
+          "operation": "modify",
+          "description": "Audit and fix the gesture-to-note mapping: verify that the vertical finger position and extension detection thresholds are calibrated for typical webcam hand positions, ensure all 25 notes (C4–C6) have distinct and reachable gesture mappings, add debouncing or state tracking to prevent continuous firing when the hand is at rest, and confirm that the note names returned match the PianoKeyboard component's key labels. Add console logging for detected gestures and thresholds."
+        }
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "summary": "Audit and fix the GesturePiano component to ensure the webcam feed, piano keyboard, and volume control render correctly in the responsive grid layout, and active note state updates are reflected visually on the PianoKeyboard component in real time",
+      "acceptanceCriteria": [
+        "GesturePiano renders all three sub-sections (webcam, keyboard, volume) without layout breakage",
+        "Active keys on PianoKeyboard highlight when corresponding gestures are detected",
+        "Volume slider adjusts playback volume in real time"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/GesturePiano.tsx",
+          "operation": "modify",
+          "description": "Audit and fix the component integration: verify that the WebcamFeed, PianoKeyboard, and VolumeControl components are rendered in a responsive grid layout without overlaps or missing sections, ensure the onGestureDetected callback from WebcamFeed correctly updates the activeNotes state, confirm that activeNotes are passed to PianoKeyboard for visual highlighting, and verify that volume changes from VolumeControl are applied to the audio player in real time. Add error boundaries and loading states if needed."
+        },
+        {
+          "path": "frontend/src/components/PianoKeyboard.tsx",
+          "operation": "modify",
+          "description": "Audit and fix the active note highlighting: verify that the activeNotes prop is correctly mapped to key IDs, ensure the visual highlight styles (e.g., background color, border) are applied to active keys, and confirm that the highlight updates in real time as gestures are detected and released. Check that the key layout matches the gesture recognition note range (C4–C6, 25 keys)."
+        },
+        {
+          "path": "frontend/src/components/VolumeControl.tsx",
+          "operation": "modify",
+          "description": "Audit and fix the volume control integration: verify that the volume slider value updates the volume state correctly, ensure the onVolumeChange callback is invoked in real time as the slider moves, and confirm that the mute/unmute icon toggles appropriately. Check that the volume value is applied to the audio player without delay."
+        }
+      ]
+    }
+  ]
+}

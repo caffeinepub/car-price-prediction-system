@@ -1,0 +1,94 @@
+{
+  "kind": "build_request",
+  "title": "Fix hand gesture piano functionality",
+  "priority": "high",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "text": "Audit and fix the WebcamFeed component's hand tracking initialization: ensure MediaPipe Hands loads correctly, the camera feed starts properly, and gesture detection events fire and propagate to the audio player without errors.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-user-1"
+        ],
+        "quotes": [
+          "it not working"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Webcam feed displays live camera output without a blank or frozen screen",
+        "MediaPipe Hands initializes without console errors",
+        "Hand landmarks are detected and drawn on the canvas overlay",
+        "Detected gestures correctly trigger note playback"
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Audit and fix the useAudioPlayer hook to ensure piano sample files load successfully for the full C4–C6 range (25 keys). If sample files fail to load, the fallback oscillator synthesis must activate automatically so notes always play.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-user-1"
+        ],
+        "quotes": [
+          "it not working"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Piano notes play audibly when a gesture is detected",
+        "No unhandled audio-context or sample-loading errors appear in the console",
+        "Fallback oscillator sounds play if sample files are unavailable",
+        "Multiple simultaneous notes can sound without audio glitches"
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Audit and fix the gesture recognition utility (gestureRecognition.ts) to ensure landmark-to-note mapping works correctly for all 25 keys (C4–C6). Verify that finger extension detection thresholds produce reliable note triggering for typical hand positions in front of a webcam.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-user-1"
+        ],
+        "quotes": [
+          "it not working"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Each of the 25 notes can be triggered by a distinct, reachable hand gesture",
+        "No notes fire continuously when the hand is at rest",
+        "Gesture-to-note mapping is consistent with the visual piano keyboard layout"
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Audit and fix the GesturePiano component to ensure the webcam feed, piano keyboard, and volume control render correctly in the responsive grid layout, and that active note state updates are reflected visually on the PianoKeyboard component in real time.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-user-1"
+        ],
+        "quotes": [
+          "it not working"
+        ]
+      },
+      "acceptanceCriteria": [
+        "GesturePiano renders all three sub-sections (webcam, keyboard, volume) without layout breakage",
+        "Active keys on PianoKeyboard highlight when corresponding gestures are detected",
+        "Volume slider adjusts playback volume in real time"
+      ]
+    }
+  ],
+  "constraints": [
+    "Do not change the backend schema or Motoko actor",
+    "Do not modify files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui"
+  ],
+  "nonGoals": [
+    "Adding new piano keys beyond the existing 25-key (C4–C6) range",
+    "Changing the visual design or color theme",
+    "Adding new features not related to fixing the broken piano functionality"
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}

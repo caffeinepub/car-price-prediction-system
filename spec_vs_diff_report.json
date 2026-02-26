@@ -1,0 +1,52 @@
+{
+  "kind": "spec_vs_diff_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-26T05:42:36.381Z",
+  "summary": "The diff implements fixes across WebcamFeed, useHandTracking, useAudioPlayer, gestureRecognition, GesturePiano, PianoKeyboard, and VolumeControl. All four requirements are at least partially addressed. REQ-1 is covered by the refactored WebcamFeed and useHandTracking hook with proper MediaPipe CDN loading, canvas drawing, and gesture propagation. REQ-2 is addressed by useAudioPlayer using pure oscillator-based synthesis with ADSR envelopes. REQ-3 is addressed by gestureRecognition.ts with 25-note mapping and finger extension thresholds. REQ-4 is addressed by GesturePiano's responsive grid layout with all three sub-sections. However, several specific acceptance criteria have concerns around sample loading fallback behavior and continuous note firing when hand is at rest.",
+  "missing_requirements": [
+    {
+      "id": "REQ-2",
+      "requirement": "Piano sample files load successfully for the full C4-C6 range (25 keys); if sample files fail to load, the fallback oscillator synthesis must activate automatically.",
+      "reason": "The useAudioPlayer implementation never attempts to load piano sample files at all. isLoading and loadError states are hardcoded to false/null, indicating no sample loading logic exists. The AC implies a primary sample-loading path with automatic fallback, which is absent.",
+      "evidence": [
+        "frontend/src/hooks/useAudioPlayer.ts"
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "requirement": "No notes fire continuously when the hand is at rest; each of the 25 notes can be triggered by a distinct, reachable hand gesture.",
+      "reason": "The debounce is purely time-based (80ms). If the hand remains stationary with 2+ fingers extended, the debounce expires and the same note re-fires indefinitely. There are no distinct gestures per note; all 25 notes are mapped solely by wrist X position in a continuous sweep.",
+      "evidence": [
+        "frontend/src/utils/gestureRecognition.ts"
+      ]
+    }
+  ],
+  "hallucinated_features": [
+    {
+      "description": "FPS counter displayed in the WebcamFeed UI using a requestAnimationFrame loop.",
+      "reason": "The build request does not mention an FPS counter or any performance display widget. This is an unrequested extra UI element.",
+      "evidence": [
+        "frontend/src/components/WebcamFeed.tsx"
+      ]
+    },
+    {
+      "description": "Mute/unmute toggle button on the VolumeControl component that toggles volume between 0 and 0.7 when the volume icon is clicked.",
+      "reason": "The build request only requires a volume slider that adjusts playback volume in real time. A dedicated mute toggle button was not requested.",
+      "evidence": [
+        "frontend/src/components/VolumeControl.tsx"
+      ]
+    }
+  ],
+  "confidence": 0.72,
+  "changed_files": [
+    "frontend-file-summaries.txt",
+    "frontend/src/components/GesturePiano.tsx",
+    "frontend/src/components/PianoKeyboard.tsx",
+    "frontend/src/components/VolumeControl.tsx",
+    "frontend/src/components/WebcamFeed.tsx",
+    "frontend/src/hooks/useAudioPlayer.ts",
+    "frontend/src/hooks/useHandTracking.ts",
+    "frontend/src/utils/gestureRecognition.ts",
+    "project_state.json"
+  ]
+}
