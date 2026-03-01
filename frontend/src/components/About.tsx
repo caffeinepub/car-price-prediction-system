@@ -1,9 +1,9 @@
 import { Award, Mail, User, Brain, Target, TrendingUp } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
-import { useGetApiContactInfo } from '../hooks/useQueries';
+import { useGetContactInfo } from '../hooks/useQueries';
 
 export function About() {
-  const { data: contactInfo } = useGetApiContactInfo();
+  const { data: contactInfo } = useGetContactInfo();
 
   return (
     <section id="about" className="py-24 bg-gradient-to-b from-background to-muted/30">

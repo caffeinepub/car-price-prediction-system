@@ -1,61 +1,45 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Add car detail photo upload to price prediction",
+  "title": "Fix inverted name display and add present/leaving time to Attendance System",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Add photo upload field with inline preview to PredictionForm.tsx allowing users to attach and preview multiple car photos before submission",
+      "summary": "Fix the attendance system so that registered person names are displayed in the correct (non-inverted) order in the attendance list UI",
       "acceptanceCriteria": [
-        "A photo upload button/dropzone is visible in the prediction form",
-        "Users can select one or more image files (JPG, PNG, WEBP) from their device",
-        "Selected photos are displayed as thumbnail previews within the form before submission",
-        "Users can remove individual photos from the selection before submitting",
-        "The form can still be submitted without photos (photos are optional)",
-        "Photo upload section is clearly labeled (e.g., 'Add Car Photos (Optional)')"
+        "Names in the attendance records list are displayed in the same order they were registered (e.g., 'Aswin Nair' shows as 'Aswin Nair', not 'Nair Aswin')",
+        "All existing attendance records show names correctly without any inversion",
+        "Newly registered faces display names correctly in all attendance views"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/PredictionForm.tsx",
+          "path": "frontend/src/components/AttendanceMonitor.tsx",
           "operation": "modify",
-          "description": "Add a photo upload section to the form with file input, thumbnail preview grid, and remove buttons. Store selected files in component state as an array of File objects. Convert files to base64-encoded strings before passing to the prediction mutation. Add a labeled section 'Add Car Photos (Optional)' with file input accepting image/jpeg,image/png,image/webp. Display selected photos as thumbnail previews in a responsive grid layout with individual remove buttons. Ensure the form remains fully functional without photos."
+          "description": "Fix the name display logic in the attendance records list to show names in the correct order as registered. Review how names are stored in face descriptors and how they are rendered in the UI table. Ensure that when displaying attendance records, the name field is shown without any string reversal or reordering. Update any sorting or display logic that may be inverting the name order."
         }
       ]
     },
     {
-      "id": "REQ-3",
-      "summary": "Update prediction history view to display thumbnail photos for predictions that included photos at submission time",
+      "id": "REQ-2",
+      "summary": "Add 'Present Time' and 'Leaving Time' fields to the attendance system with UI actions to record both timestamps",
       "acceptanceCriteria": [
-        "Prediction history entries that include photos show at least one thumbnail image",
-        "Thumbnails are small and do not disrupt the layout of the history list",
-        "Entries without photos render normally without any broken image placeholder"
+        "The backend attendance record type includes both a presentTime and a leavingTime field (as timestamps or nullable text)",
+        "When a face is recognized and attendance is marked, the presentTime is recorded and stored",
+        "There is a UI action (e.g., a 'Mark Leaving' button per record or a leave detection trigger) to record the leavingTime for a recognized person",
+        "The attendance records list displays both 'Present Time' and 'Leaving Time' columns for each record",
+        "If a person has not yet been marked as leaving, the leaving time column shows a placeholder such as 'Still Present' or '-'",
+        "Times are displayed in a human-readable format (e.g., HH:MM:SS or locale string)"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/PredictionHistory.tsx",
-          "operation": "create",
-          "description": "Create a new component that fetches and displays prediction history using the useGetPredictionHistory hook. For each history entry, render the car specifications and prediction results. If the CarSpecs object includes a photos array with ExternalBlob instances, display the first photo as a small thumbnail (e.g., 80x80px) using the ExternalBlob getDirectURL() method. Ensure entries without photos render normally without broken placeholders. Use the blob-storage component's ExternalBlob class to handle photo URLs. Verify the component's usage instructions before implementing."
+          "path": "frontend/src/components/AttendanceMonitor.tsx",
+          "operation": "modify",
+          "description": "Add UI columns for 'Present Time' and 'Leaving Time' in the attendance records table. Display the presentTime from the backend AttendanceRecord in a human-readable format (e.g., using toLocaleTimeString()). Add a 'Mark Leaving' button for each record that does not yet have a leavingTime. When the button is clicked, call the markLeaving mutation with the record ID. Display the leavingTime if available, or show 'Still Present' or '-' if null. Ensure the UI updates reactively when times are recorded."
         },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Import and render the new PredictionHistory component in the main app layout, placing it below the PredictionForm or in a dedicated section visible to authenticated users. Ensure it only displays when the user is logged in and has a profile."
-        }
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "summary": "Update the prediction mutation in useQueries.ts to accept and pass photo data (base64 strings array) to the backend actor call",
-      "acceptanceCriteria": [
-        "The prediction mutation hook accepts an optional photos array parameter",
-        "Photos are included in the backend actor call payload",
-        "If no photos are provided, an empty array or null is passed gracefully"
-      ],
-      "file_operations": [
         {
           "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Update the usePredictCarPrice mutation to accept an optional photos parameter (array of base64-encoded strings). Convert the base64 strings to ExternalBlob instances using ExternalBlob.fromBytes() before passing to the backend actor's predictCarPrice method. Update the CarSpecs payload to include the photos array. If no photos are provided, pass an empty array or omit the field. Use the blob-storage component to handle photo conversion. Verify the component's usage instructions before implementing."
+          "description": "Add a mutation hook useMarkLeaving that calls the backend markLeaving(recordId: bigint) method. The mutation should accept a recordId parameter, call actor.markLeaving(recordId), and invalidate the 'attendanceRecords' query key to refresh the list after marking a person as leaving. Include proper error handling and loading states."
         }
       ]
     }

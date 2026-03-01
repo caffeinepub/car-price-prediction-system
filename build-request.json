@@ -1,96 +1,58 @@
 {
   "kind": "build_request",
-  "title": "Add car detail photo upload to price prediction",
-  "projectName": "Car Price Predictor",
+  "title": "Fix inverted name display and add present/leaving time to Attendance System",
+  "projectName": "Attendance Monitor",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Add a photo upload field to the car price prediction form (PredictionForm.tsx) that allows users to attach one or more car detail photos (e.g., exterior, interior, dashboard) before submitting for price prediction. The uploaded images should be previewed inline within the form before submission.",
+      "text": "Fix the attendance system so that registered person names are displayed in the correct (non-inverted) order in the attendance list UI. Names should appear exactly as they were registered, not reversed or flipped.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-14"
+          "msg-4"
         ],
         "quotes": [
-          "add one more features like add detail photo to add predict price"
+          "attandance system name showing inverted show currectly"
         ]
       },
       "acceptanceCriteria": [
-        "A photo upload button/dropzone is visible in the prediction form",
-        "Users can select one or more image files (JPG, PNG, WEBP) from their device",
-        "Selected photos are displayed as thumbnail previews within the form before submission",
-        "Users can remove individual photos from the selection before submitting",
-        "The form can still be submitted without photos (photos are optional)",
-        "Photo upload section is clearly labeled (e.g., 'Add Car Photos (Optional)')"
+        "Names in the attendance records list are displayed in the same order they were registered (e.g., 'Aswin Nair' shows as 'Aswin Nair', not 'Nair Aswin')",
+        "All existing attendance records show names correctly without any inversion",
+        "Newly registered faces display names correctly in all attendance views"
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Store uploaded car photo data (as base64-encoded blobs) alongside the car specification fields in the backend prediction record. Update the CarSpecs or prediction type in backend/main.mo to include an optional photos field (array of blob or text), and update the savePrediction / predictPrice backend function to accept and persist photo data.",
-      "target": "backend",
+      "text": "Add 'Present Time' and 'Leaving Time' fields to the attendance system. When a person is marked as present (face recognized), record the timestamp as their present time. When they are marked as leaving (or the session ends / a leave event is triggered), record the timestamp as their leaving time. Both times should be displayed in the attendance records list.",
+      "target": "both",
       "source": {
         "messageIds": [
-          "msg-14"
+          "msg-4"
         ],
         "quotes": [
-          "add detail photo to add predict price"
+          "it present and leaving time also add"
         ]
       },
       "acceptanceCriteria": [
-        "The CarSpecs or prediction record type includes an optional photos field (e.g., ?[Text] for base64 strings)",
-        "The predict/save endpoint accepts photo data alongside car specification fields",
-        "Photo data is persisted in prediction history records",
-        "Existing predictions without photos remain valid (backwards compatible)"
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "text": "Update the prediction history view to display thumbnail photos associated with each past prediction, if photos were provided at submission time.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-14"
-        ],
-        "quotes": [
-          "add detail photo to add predict price"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Prediction history entries that include photos show at least one thumbnail image",
-        "Thumbnails are small and do not disrupt the layout of the history list",
-        "Entries without photos render normally without any broken image placeholder"
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "text": "Update the useQueries.ts mutation for car price prediction to pass the selected photo data (base64 strings array) to the backend actor call alongside existing car spec fields.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-14"
-        ],
-        "quotes": [
-          "add detail photo to add predict price"
-        ]
-      },
-      "acceptanceCriteria": [
-        "The prediction mutation hook accepts an optional photos array parameter",
-        "Photos are included in the backend actor call payload",
-        "If no photos are provided, an empty array or null is passed gracefully"
+        "The backend attendance record type includes both a presentTime and a leavingTime field (as timestamps or nullable text)",
+        "When a face is recognized and attendance is marked, the presentTime is recorded and stored",
+        "There is a UI action (e.g., a 'Mark Leaving' button per record or a leave detection trigger) to record the leavingTime for a recognized person",
+        "The attendance records list displays both 'Present Time' and 'Leaving Time' columns for each record",
+        "If a person has not yet been marked as leaving, the leaving time column shows a placeholder such as 'Still Present' or '-'",
+        "Times are displayed in a human-readable format (e.g., HH:MM:SS or locale string)"
       ]
     }
   ],
   "constraints": [
-    "Photo storage must use base64-encoded text in the Motoko backend — no external storage services",
-    "Do not modify files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui",
-    "Photo upload is optional — the prediction form must remain fully functional without photos"
+    "Do not modify any files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui",
+    "All backend logic must remain in the single actor in backend/main.mo"
   ],
   "nonGoals": [
-    "Image-based ML price prediction (photos are for record-keeping/display only, not used in the prediction algorithm)",
-    "Cloud storage or CDN hosting of photos",
-    "Video upload support",
-    "Photo editing or cropping tools"
+    "Redesigning the overall attendance UI layout or theme",
+    "Adding new biometric recognition methods beyond existing face-api.js integration",
+    "Implementing shift scheduling or overtime calculations",
+    "Email or push notification for attendance events"
   ],
   "imageRequirements": {
     "required": [],

@@ -1,32 +1,26 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Car price prediction app with photo upload feature for price prediction.",
+  "summary": "Attendance management system with fixes for inverted name display and addition of present/leaving time tracking.",
   "architectural_notes": [],
-  "known_issues": [],
-  "isFixRequest": false,
+  "known_issues": [
+    "Attendance system displays names in inverted order"
+  ],
+  "isFixRequest": true,
   "existing_features": [
     {
-      "id": "feature-add-a-photo-upload-field-to-the-car-price-prediction-form-predictionform-tsx-that-allows-users-to-attach-one-or-more-car-detail-photos-e-g-exterior-interior-dashboard-before-submitting-for-price-prediction-the-uploaded-images-should-be-previewed-inline-within-the-form-before-submission",
-      "title": "Add a photo upload field to the car price prediction form (PredictionForm.tsx) that allows users to attach one or more car detail photos (e.g., exterior, interior, dashboard) before submitting for price prediction. The uploaded images should be previewed inline within the form before submission.",
+      "id": "feature-fix-the-attendance-system-so-that-registered-person-names-are-displayed-in-the-correct-non-inverted-order-in-the-attendance-list-ui-names-should-appear-exactly-as-they-were-registered-not-reversed-or-flipped",
+      "title": "Fix the attendance system so that registered person names are displayed in the correct (non-inverted) order in the attendance list UI. Names should appear exactly as they were registered, not reversed or flipped.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-update-the-prediction-history-view-to-display-thumbnail-photos-associated-with-each-past-prediction-if-photos-were-provided-at-submission-time",
-      "title": "Update the prediction history view to display thumbnail photos associated with each past prediction, if photos were provided at submission time.",
+      "id": "feature-add-present-time-and-leaving-time-fields-to-the-attendance-system-when-a-person-is-marked-as-present-face-recognized-record-the-timestamp-as-their-present-time-when-they-are-marked-as-leaving-or-the-session-ends-a-leave-event-is-triggered-record-the-timestamp-as-their-leaving-time-both-times-should-be-displayed-in-the-attendance-records-list",
+      "title": "Add 'Present Time' and 'Leaving Time' fields to the attendance system. When a person is marked as present (face recognized), record the timestamp as their present time. When they are marked as leaving (or the session ends / a leave event is triggered), record the timestamp as their leaving time. Both times should be displayed in the attendance records list.",
       "reqIds": [
-        "REQ-3"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-update-the-usequeries-ts-mutation-for-car-price-prediction-to-pass-the-selected-photo-data-base64-strings-array-to-the-backend-actor-call-alongside-existing-car-spec-fields",
-      "title": "Update the useQueries.ts mutation for car price prediction to pass the selected photo data (base64 strings array) to the backend actor call alongside existing car spec fields.",
-      "reqIds": [
-        "REQ-4"
+        "REQ-2"
       ],
       "version": 1
     }
@@ -34,21 +28,19 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Add photo upload feature to include car detail photos when predicting price",
+      "summary": "Fix inverted name display in attendance system",
       "reqIds": [],
       "status": "pending"
     },
     {
-      "id": "AR-3",
-      "summary": "Store uploaded car photo data (as base64-encoded blobs) alongside the car specification fields in the backend prediction record. Update the CarSpecs or prediction type in backend/main.mo to include an optional photos field (array of blob or text), and update the savePrediction / predictPrice backend function to accept and persist photo data.",
-      "reqIds": [
-        "REQ-2"
-      ],
+      "id": "AR-2",
+      "summary": "Add present time and leaving time fields to attendance system",
+      "reqIds": [],
       "status": "pending"
     }
   ],
   "gameProjectType": "none",
-  "projectName": "Car Price Prediction",
+  "projectName": "Attendance System",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

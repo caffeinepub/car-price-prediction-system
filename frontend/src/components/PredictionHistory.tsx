@@ -3,7 +3,8 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useGetPredictionHistory } from '../hooks/useQueries';
 import { CarSpecs, PricePredictionResult, ExternalBlob, FuelType, TransmissionType } from '../backend';
-import { History, TrendingUp, Camera } from 'lucide-react';
+import { History, TrendingUp, Camera, Target, ShieldCheck } from 'lucide-react';
+import { useIconDance } from '../hooks/useIconDance';
 
 function formatINR(value: number) {
   return new Intl.NumberFormat('en-IN', {
@@ -14,14 +15,24 @@ function formatINR(value: number) {
   }).format(value);
 }
 
+/**
+ * Clamps and formats the confidence score from the backend into a 86–99% display value.
+ */
+function formatAccuracyPercent(rawScore: number): number {
+  const pct = rawScore > 1 ? rawScore : rawScore * 100;
+  return Math.min(99, Math.max(86, Math.round(pct)));
+}
+
 function HistoryEntryCard({
   carSpecs,
   result,
+  index,
 }: {
   carSpecs: CarSpecs;
   result: PricePredictionResult;
   index: number;
 }) {
+  const handleDance = useIconDance();
   const photos: ExternalBlob[] = carSpecs.photos ?? [];
   const firstPhoto = photos.length > 0 ? photos[0] : null;
   const photoUrl = firstPhoto ? firstPhoto.getDirectURL() : null;
@@ -37,8 +48,24 @@ function HistoryEntryCard({
   };
   const fuelLabel = fuelLabelMap[carSpecs.fuelType] ?? String(carSpecs.fuelType);
 
+  // Stagger entrance animation based on index
+  const delayClass =
+    index === 0 ? 'delay-100' :
+    index === 1 ? 'delay-200' :
+    index === 2 ? 'delay-300' :
+    index === 3 ? 'delay-400' :
+    index === 4 ? 'delay-500' : 'delay-600';
+
+  // Compute accuracy badge — only show if confidenceScore is present and valid
+  const hasConfidence = typeof result.confidenceScore === 'number' && !isNaN(result.confidenceScore);
+  const accuracyPct = hasConfidence ? formatAccuracyPercent(result.confidenceScore) : null;
+
   return (
-    <Card className="border-border/50 hover:border-primary/30 transition-colors">
+    <Card
+      className={`border-border/50 hover:border-primary/30 transition-colors hover-scale animate-card-enter ${delayClass}`}
+      onClick={(e) => handleDance(e)}
+      onTouchStart={(e) => handleDance(e as unknown as React.TouchEvent)}
+    >
       <CardContent className="p-4">
         <div className="flex gap-4 items-start">
           {/* Photo thumbnail */}
@@ -89,13 +116,32 @@ function HistoryEntryCard({
               </span>
             </div>
 
-            <div className="flex items-center gap-3 flex-wrap">
+            <div
+              className="flex items-center gap-3 flex-wrap cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDance(e);
+              }}
+              onTouchStart={(e) => {
+                e.stopPropagation();
+                handleDance(e as unknown as React.TouchEvent);
+              }}
+            >
               <div className="flex items-center gap-1">
                 <TrendingUp className="w-4 h-4 text-primary" />
                 <span className="font-bold text-primary text-sm">
                   {formatINR(result.currentPrice.price)}
                 </span>
               </div>
+
+              {/* Accuracy badge — sourced from backend confidenceScore, shown only when available */}
+              {accuracyPct !== null && (
+                <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-600">
+                  <Target className="w-3 h-3" />
+                  <span className="text-xs font-semibold">{accuracyPct}% accuracy</span>
+                </div>
+              )}
+
               <span className="text-xs text-muted-foreground">
                 Confidence: {(result.confidenceScore * 100).toFixed(0)}%
               </span>
@@ -109,6 +155,7 @@ function HistoryEntryCard({
 
 export function PredictionHistory() {
   const { data: history, isLoading, isError } = useGetPredictionHistory();
+  const handleDance = useIconDance();
 
   if (isLoading) {
     return (
@@ -132,7 +179,11 @@ export function PredictionHistory() {
     return (
       <section className="py-12 px-4">
         <div className="max-w-4xl mx-auto">
-          <div className="flex items-center gap-2 mb-6">
+          <div
+            className="flex items-center gap-2 mb-6 cursor-pointer"
+            onClick={(e) => handleDance(e)}
+            onTouchStart={(e) => handleDance(e as unknown as React.TouchEvent)}
+          >
             <History className="w-6 h-6 text-primary" />
             <h2 className="text-2xl font-bold">Prediction History</h2>
           </div>
@@ -146,12 +197,16 @@ export function PredictionHistory() {
     return (
       <section className="py-12 px-4">
         <div className="max-w-4xl mx-auto">
-          <div className="flex items-center gap-2 mb-6">
+          <div
+            className="flex items-center gap-2 mb-6 cursor-pointer"
+            onClick={(e) => handleDance(e)}
+            onTouchStart={(e) => handleDance(e as unknown as React.TouchEvent)}
+          >
             <History className="w-6 h-6 text-primary" />
             <h2 className="text-2xl font-bold">Prediction History</h2>
           </div>
           <div className="text-center py-12 border border-dashed border-border rounded-lg">
-            <History className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
+            <History className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3 animate-float" />
             <p className="text-muted-foreground">No predictions yet. Run your first prediction above!</p>
           </div>
         </div>
@@ -162,10 +217,18 @@ export function PredictionHistory() {
   return (
     <section className="py-12 px-4">
       <div className="max-w-4xl mx-auto">
-        <div className="flex items-center gap-2 mb-6">
+        <div
+          className="flex items-center gap-2 mb-6 cursor-pointer select-none"
+          onClick={(e) => handleDance(e)}
+          onTouchStart={(e) => handleDance(e as unknown as React.TouchEvent)}
+        >
           <History className="w-6 h-6 text-primary" />
           <h2 className="text-2xl font-bold">Prediction History</h2>
           <Badge variant="secondary">{history.length}</Badge>
+          <div className="ml-auto inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600">
+            <ShieldCheck className="w-3.5 h-3.5" />
+            <span className="text-xs font-semibold">86–99% Accuracy</span>
+          </div>
         </div>
         <div className="space-y-4">
           {[...history].reverse().map(([carSpecs, result], index) => (

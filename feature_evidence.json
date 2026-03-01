@@ -2,10 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-add-a-photo-upload-field-to-the-car-price-prediction-form-predictionform-tsx-that-allows-users-to-attach-one-or-more-car-detail-photos-e-g-exterior-interior-dashboard-before-submitting-for-price-prediction-the-uploaded-images-should-be-previewed-inline-within-the-form-before-submission",
-      "featureTitle": "Add a photo upload field to the car price prediction form (PredictionForm.tsx) that allows users to attach one or more car detail photos (e.g., exterior, interior, dashboard) before submitting for price prediction. The uploaded images should be previewed inline within the form before submission.",
+      "featureId": "feature-fix-the-attendance-system-so-that-registered-person-names-are-displayed-in-the-correct-non-inverted-order-in-the-attendance-list-ui-names-should-appear-exactly-as-they-were-registered-not-reversed-or-flipped",
+      "featureTitle": "Fix the attendance system so that registered person names are displayed in the correct (non-inverted) order in the attendance list UI. Names should appear exactly as they were registered, not reversed or flipped.",
       "files": [
-        "frontend/src/components/PredictionForm.tsx"
+        "frontend/src/components/AttendanceMonitor.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -23,31 +23,10 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-update-the-prediction-history-view-to-display-thumbnail-photos-associated-with-each-past-prediction-if-photos-were-provided-at-submission-time",
-      "featureTitle": "Update the prediction history view to display thumbnail photos associated with each past prediction, if photos were provided at submission time.",
+      "featureId": "feature-add-present-time-and-leaving-time-fields-to-the-attendance-system-when-a-person-is-marked-as-present-face-recognized-record-the-timestamp-as-their-present-time-when-they-are-marked-as-leaving-or-the-session-ends-a-leave-event-is-triggered-record-the-timestamp-as-their-leaving-time-both-times-should-be-displayed-in-the-attendance-records-list",
+      "featureTitle": "Add 'Present Time' and 'Leaving Time' fields to the attendance system. When a person is marked as present (face recognized), record the timestamp as their present time. When they are marked as leaving (or the session ends / a leave event is triggered), record the timestamp as their leaving time. Both times should be displayed in the attendance records list.",
       "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/components/PredictionHistory.tsx"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "blob-storage@4.0.0",
-        "authorization@4.0.0",
-        "github-export-icp-cli@1.0.0",
-        "camera@1.0.0"
-      ],
-      "testIds": [
-        "REQ-3"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-update-the-usequeries-ts-mutation-for-car-price-prediction-to-pass-the-selected-photo-data-base64-strings-array-to-the-backend-actor-call-alongside-existing-car-spec-fields",
-      "featureTitle": "Update the useQueries.ts mutation for car price prediction to pass the selected photo data (base64 strings array) to the backend actor call alongside existing car spec fields.",
-      "files": [
+        "frontend/src/components/AttendanceMonitor.tsx",
         "frontend/src/hooks/useQueries.ts"
       ],
       "components": [
@@ -61,7 +40,7 @@
         "camera@1.0.0"
       ],
       "testIds": [
-        "REQ-4"
+        "REQ-2"
       ],
       "confidence": "high"
     }

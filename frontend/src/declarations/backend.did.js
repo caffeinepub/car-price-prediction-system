@@ -28,10 +28,28 @@ export const ApiContactInfo = IDL.Record({
   'founder' : IDL.Text,
   'contactEmail' : IDL.Text,
 });
+export const AttendanceStatus = IDL.Variant({
+  'present' : IDL.Null,
+  'late' : IDL.Null,
+  'absent' : IDL.Null,
+});
+export const Time = IDL.Int;
+export const AttendanceRecord = IDL.Record({
+  'id' : IDL.Nat,
+  'status' : AttendanceStatus,
+  'leavingTime' : IDL.Opt(Time),
+  'name' : IDL.Text,
+  'presentTime' : IDL.Opt(Time),
+});
 export const UserProfile = IDL.Record({
   'name' : IDL.Text,
   'email' : IDL.Text,
   'profilePictureUrl' : IDL.Opt(IDL.Text),
+});
+export const InsuranceInfo = IDL.Record({
+  'provider' : IDL.Text,
+  'expirationDate' : Time,
+  'policyNumber' : IDL.Text,
 });
 export const TransmissionType = IDL.Variant({
   'automatic' : IDL.Null,
@@ -43,15 +61,28 @@ export const FuelType = IDL.Variant({
   'diesel' : IDL.Null,
   'electric' : IDL.Null,
 });
+export const ServiceRecord = IDL.Record({
+  'cost' : IDL.Float64,
+  'date' : Time,
+  'description' : IDL.Text,
+});
+export const ServiceHistory = IDL.Record({
+  'serviceRecords' : IDL.Opt(IDL.Vec(ServiceRecord)),
+  'lastServiceDate' : IDL.Opt(Time),
+});
 export const ExternalBlob = IDL.Vec(IDL.Nat8);
 export const CarSpecs = IDL.Record({
+  'purchasePrice' : IDL.Opt(IDL.Float64),
   'mileage' : IDL.Nat,
   'owners' : IDL.Nat,
+  'insuranceDetails' : IDL.Opt(InsuranceInfo),
   'transmission' : TransmissionType,
   'fuelType' : FuelType,
   'modelYear' : IDL.Nat,
   'brand' : IDL.Text,
   'usageDuration' : IDL.Nat,
+  'serviceHistory' : IDL.Opt(ServiceHistory),
+  'location' : IDL.Opt(IDL.Text),
   'photos' : IDL.Opt(IDL.Vec(ExternalBlob)),
   'yearOfPurchase' : IDL.Nat,
 });
@@ -79,6 +110,13 @@ export const Adjustments = IDL.Record({
   'usageDurationAdjustment' : IDL.Float64,
   'purchaseYearAdjustment' : IDL.Float64,
 });
+export const PriceFactors = IDL.Record({
+  'mileageImpact' : IDL.Float64,
+  'fuelTypePremium' : IDL.Float64,
+  'brandTierWeight' : IDL.Float64,
+  'transmissionFactor' : IDL.Float64,
+  'yearDepreciation' : IDL.Float64,
+});
 export const TimePrediction = IDL.Record({
   'depreciationRate' : IDL.Float64,
   'priceEstimate' : PriceEstimate,
@@ -90,7 +128,9 @@ export const PricePredictionResult = IDL.Record({
   'detailedBreakdown' : PriceBreakdown,
   'confidenceScore' : IDL.Float64,
   'adjustments' : Adjustments,
+  'priceFactors' : PriceFactors,
   'futurePredictions' : IDL.Vec(TimePrediction),
+  'recommendationScore' : IDL.Float64,
 });
 
 export const idlService = IDL.Service({
@@ -125,6 +165,7 @@ export const idlService = IDL.Service({
   'assignRole' : IDL.Func([IDL.Principal, UserRole], [], []),
   'checkSystemStatus' : IDL.Func([], [IDL.Text], ['query']),
   'getApiContactInfo' : IDL.Func([], [ApiContactInfo], ['query']),
+  'getAttendanceRecords' : IDL.Func([], [IDL.Vec(AttendanceRecord)], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getContactInfo' : IDL.Func([], [ApiContactInfo], ['query']),
@@ -133,7 +174,6 @@ export const idlService = IDL.Service({
       [IDL.Vec(IDL.Tuple(CarSpecs, PricePredictionResult))],
       ['query'],
     ),
-  'getPythonMegaCode' : IDL.Func([], [IDL.Text], ['query']),
   'getUserProfile' : IDL.Func(
       [IDL.Principal],
       [IDL.Opt(UserProfile)],
@@ -145,7 +185,14 @@ export const idlService = IDL.Service({
   'isSubscriptionActive' : IDL.Func([IDL.Text], [IDL.Bool], []),
   'login' : IDL.Func([IDL.Text], [IDL.Text], []),
   'logout' : IDL.Func([], [IDL.Text], []),
-  'predictCarPrice' : IDL.Func([CarSpecs], [PricePredictionResult], []),
+  'markLeaving' : IDL.Func([IDL.Nat], [], []),
+  'markPresent' : IDL.Func([IDL.Text], [], []),
+  'predictCarPriceWithAdvancedFactors' : IDL.Func(
+      [CarSpecs],
+      [PricePredictionResult],
+      [],
+    ),
+  'registerFace' : IDL.Func([IDL.Text], [], []),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
 });
 
@@ -172,10 +219,28 @@ export const idlFactory = ({ IDL }) => {
     'founder' : IDL.Text,
     'contactEmail' : IDL.Text,
   });
+  const AttendanceStatus = IDL.Variant({
+    'present' : IDL.Null,
+    'late' : IDL.Null,
+    'absent' : IDL.Null,
+  });
+  const Time = IDL.Int;
+  const AttendanceRecord = IDL.Record({
+    'id' : IDL.Nat,
+    'status' : AttendanceStatus,
+    'leavingTime' : IDL.Opt(Time),
+    'name' : IDL.Text,
+    'presentTime' : IDL.Opt(Time),
+  });
   const UserProfile = IDL.Record({
     'name' : IDL.Text,
     'email' : IDL.Text,
     'profilePictureUrl' : IDL.Opt(IDL.Text),
+  });
+  const InsuranceInfo = IDL.Record({
+    'provider' : IDL.Text,
+    'expirationDate' : Time,
+    'policyNumber' : IDL.Text,
   });
   const TransmissionType = IDL.Variant({
     'automatic' : IDL.Null,
@@ -187,15 +252,28 @@ export const idlFactory = ({ IDL }) => {
     'diesel' : IDL.Null,
     'electric' : IDL.Null,
   });
+  const ServiceRecord = IDL.Record({
+    'cost' : IDL.Float64,
+    'date' : Time,
+    'description' : IDL.Text,
+  });
+  const ServiceHistory = IDL.Record({
+    'serviceRecords' : IDL.Opt(IDL.Vec(ServiceRecord)),
+    'lastServiceDate' : IDL.Opt(Time),
+  });
   const ExternalBlob = IDL.Vec(IDL.Nat8);
   const CarSpecs = IDL.Record({
+    'purchasePrice' : IDL.Opt(IDL.Float64),
     'mileage' : IDL.Nat,
     'owners' : IDL.Nat,
+    'insuranceDetails' : IDL.Opt(InsuranceInfo),
     'transmission' : TransmissionType,
     'fuelType' : FuelType,
     'modelYear' : IDL.Nat,
     'brand' : IDL.Text,
     'usageDuration' : IDL.Nat,
+    'serviceHistory' : IDL.Opt(ServiceHistory),
+    'location' : IDL.Opt(IDL.Text),
     'photos' : IDL.Opt(IDL.Vec(ExternalBlob)),
     'yearOfPurchase' : IDL.Nat,
   });
@@ -223,6 +301,13 @@ export const idlFactory = ({ IDL }) => {
     'usageDurationAdjustment' : IDL.Float64,
     'purchaseYearAdjustment' : IDL.Float64,
   });
+  const PriceFactors = IDL.Record({
+    'mileageImpact' : IDL.Float64,
+    'fuelTypePremium' : IDL.Float64,
+    'brandTierWeight' : IDL.Float64,
+    'transmissionFactor' : IDL.Float64,
+    'yearDepreciation' : IDL.Float64,
+  });
   const TimePrediction = IDL.Record({
     'depreciationRate' : IDL.Float64,
     'priceEstimate' : PriceEstimate,
@@ -234,7 +319,9 @@ export const idlFactory = ({ IDL }) => {
     'detailedBreakdown' : PriceBreakdown,
     'confidenceScore' : IDL.Float64,
     'adjustments' : Adjustments,
+    'priceFactors' : PriceFactors,
     'futurePredictions' : IDL.Vec(TimePrediction),
+    'recommendationScore' : IDL.Float64,
   });
   
   return IDL.Service({
@@ -269,6 +356,11 @@ export const idlFactory = ({ IDL }) => {
     'assignRole' : IDL.Func([IDL.Principal, UserRole], [], []),
     'checkSystemStatus' : IDL.Func([], [IDL.Text], ['query']),
     'getApiContactInfo' : IDL.Func([], [ApiContactInfo], ['query']),
+    'getAttendanceRecords' : IDL.Func(
+        [],
+        [IDL.Vec(AttendanceRecord)],
+        ['query'],
+      ),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
     'getContactInfo' : IDL.Func([], [ApiContactInfo], ['query']),
@@ -277,7 +369,6 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(IDL.Tuple(CarSpecs, PricePredictionResult))],
         ['query'],
       ),
-    'getPythonMegaCode' : IDL.Func([], [IDL.Text], ['query']),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
         [IDL.Opt(UserProfile)],
@@ -289,7 +380,14 @@ export const idlFactory = ({ IDL }) => {
     'isSubscriptionActive' : IDL.Func([IDL.Text], [IDL.Bool], []),
     'login' : IDL.Func([IDL.Text], [IDL.Text], []),
     'logout' : IDL.Func([], [IDL.Text], []),
-    'predictCarPrice' : IDL.Func([CarSpecs], [PricePredictionResult], []),
+    'markLeaving' : IDL.Func([IDL.Nat], [], []),
+    'markPresent' : IDL.Func([IDL.Text], [], []),
+    'predictCarPriceWithAdvancedFactors' : IDL.Func(
+        [CarSpecs],
+        [PricePredictionResult],
+        [],
+      ),
+    'registerFace' : IDL.Func([IDL.Text], [], []),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
   });
 };

@@ -1,54 +1,36 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-03-01T04:00:10.227Z",
+  "generatedAt": "2026-03-01T14:58:25.146Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 4,
-    "implemented": 3,
+    "total": 2,
+    "implemented": 2,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Add a photo upload field to the car price prediction form (PredictionForm.tsx) that allows users to attach one or more car detail photos (e.g., exterior, interior, dashboard) before submitting for price prediction. The uploaded images should be previewed inline within the form before submission.",
+        "summary": "Fix the attendance system so that registered person names are displayed in the correct (non-inverted) order in the attendance list UI. Names should appear exactly as they were registered, not reversed or flipped.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/PredictionForm.tsx"
+          "frontend/src/components/AttendanceMonitor.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/PredictionForm.tsx"
+          "frontend/src/components/AttendanceMonitor.tsx"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Store uploaded car photo data (as base64-encoded blobs) alongside the car specification fields in the backend prediction record. Update the CarSpecs or prediction type in backend/main.mo to include an optional photos field (array of blob or text), and update the savePrediction / predictPrice backend function to accept and persist photo data.",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-3",
-        "summary": "Update the prediction history view to display thumbnail photos associated with each past prediction, if photos were provided at submission time.",
+        "summary": "Add 'Present Time' and 'Leaving Time' fields to the attendance system. When a person is marked as present (face recognized), record the timestamp as their present time. When they are marked as leaving (or the session ends / a leave event is triggered), record the timestamp as their leaving time. Both times should be displayed in the attendance records list.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/PredictionHistory.tsx",
-          "frontend/src/App.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/PredictionHistory.tsx",
-          "frontend/src/App.tsx"
-        ]
-      },
-      {
-        "id": "REQ-4",
-        "summary": "Update the useQueries.ts mutation for car price prediction to pass the selected photo data (base64 strings array) to the backend actor call alongside existing car spec fields.",
-        "status": "implemented",
-        "plannedFiles": [
+          "frontend/src/components/AttendanceMonitor.tsx",
           "frontend/src/hooks/useQueries.ts"
         ],
         "matchedFiles": [
+          "frontend/src/components/AttendanceMonitor.tsx",
           "frontend/src/hooks/useQueries.ts"
         ]
       }
@@ -64,8 +46,9 @@
     "frontend/src/App.tsx",
     "frontend/src/backend.d.ts",
     "frontend/src/backend.ts",
+    "frontend/src/components/About.tsx",
+    "frontend/src/components/AttendanceMonitor.tsx",
     "frontend/src/components/PredictionForm.tsx",
-    "frontend/src/components/PredictionHistory.tsx",
     "frontend/src/declarations/backend.did.d.ts",
     "frontend/src/declarations/backend.did.js",
     "frontend/src/hooks/useQueries.ts",

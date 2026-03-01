@@ -9,8 +9,13 @@ import AccessControl "authorization/access-control";
 import MixinAuthorization "authorization/MixinAuthorization";
 import Storage "blob-storage/Storage";
 import MixinStorage "blob-storage/Mixin";
+import List "mo:core/List";
+import Time "mo:core/Time";
+
+// Add migration import for upgrade
 import Migration "migration";
 
+// Use migration for upgrades
 (with migration = Migration.run)
 actor {
   // Integrate file storage functionality
@@ -20,26 +25,19 @@ actor {
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
 
-  // Car specifications and prediction-related types
-  public type CarSpecs = {
-    brand : Text;
-    modelYear : Nat;
-    mileage : Nat;
-    transmission : TransmissionType;
-    fuelType : FuelType;
-    owners : Nat;
-    yearOfPurchase : Nat;
-    usageDuration : Nat;
-    photos : ?[Storage.ExternalBlob]; // Multiple photos
+  // Updated Attendance record to include present and leaving time as options
+  public type AttendanceRecord = {
+    id : Nat;
+    name : Text;
+    presentTime : ?Time.Time;
+    leavingTime : ?Time.Time;
+    status : AttendanceStatus;
   };
 
-  public type PricePredictionResult = {
-    currentPrice : PriceEstimate;
-    futurePredictions : [TimePrediction];
-    detailedBreakdown : PriceBreakdown;
-    confidenceScore : Float;
-    predictionsByYear : [YearlyPrediction];
-    adjustments : Adjustments;
+  public type AttendanceStatus = {
+    #present;
+    #late;
+    #absent;
   };
 
   public type TransmissionType = {
@@ -52,6 +50,58 @@ actor {
     #diesel;
     #electric;
     #hybrid;
+  };
+
+  public type CarSpecs = {
+    brand : Text;
+    modelYear : Nat;
+    mileage : Nat;
+    transmission : TransmissionType;
+    fuelType : FuelType;
+    owners : Nat;
+    yearOfPurchase : Nat;
+    usageDuration : Nat;
+    photos : ?[Storage.ExternalBlob];
+    purchasePrice : ?Float;
+    serviceHistory : ?ServiceHistory;
+    location : ?Text;
+    insuranceDetails : ?InsuranceInfo;
+  };
+
+  public type ServiceHistory = {
+    lastServiceDate : ?Time.Time;
+    serviceRecords : ?[ServiceRecord];
+  };
+
+  public type ServiceRecord = {
+    date : Time.Time;
+    description : Text;
+    cost : Float;
+  };
+
+  public type InsuranceInfo = {
+    provider : Text;
+    policyNumber : Text;
+    expirationDate : Time.Time;
+  };
+
+  public type PricePredictionResult = {
+    currentPrice : PriceEstimate;
+    futurePredictions : [TimePrediction];
+    detailedBreakdown : PriceBreakdown;
+    confidenceScore : Float;
+    predictionsByYear : [YearlyPrediction];
+    adjustments : Adjustments;
+    priceFactors : PriceFactors;
+    recommendationScore : Float;
+  };
+
+  public type PriceFactors = {
+    brandTierWeight : Float;
+    yearDepreciation : Float;
+    mileageImpact : Float;
+    fuelTypePremium : Float;
+    transmissionFactor : Float;
   };
 
   public type PriceEstimate = {
@@ -100,122 +150,71 @@ actor {
   // Conversion rate for USD to INR
   let usdToInrRate : Float = 83.0;
 
-  // In-memory storage for prediction history
   let predictionHistory = Map.empty<Principal, [(CarSpecs, PricePredictionResult)]>();
 
-  // Google Colab–ready, single-cell Python “mega code” for car price prediction
-  let pythonCode : Text = "
-# 🚀 Car Price Prediction - Colab All-in-One Cell
-# Paste this cell into Colab, modify it for your needs - and run!
-!pip install scikit-learn pandas matplotlib seaborn --quiet
-import pandas as pd
-import numpy as np
-from sklearn.model_selection import train_test_split, RandomizedSearchCV
-from sklearn.linear_model import LinearRegression, RidgeCV, LassoCV
-from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
-from sklearn.metrics import mean_squared_error, r2_score
-import matplotlib.pyplot as plt
-import seaborn as sns
-import pickle
-# Sample data - Replace this with your own!
-data = {
-    `brand`: ['Toyota', 'Honda', 'Ford', 'BMW'],
-    `model_year`: [2015, 2018, 2012, 2020],
-    `mileage`: [50000, 30000, 70000, 15000],
-    `transmission`: ['automatic', 'manual', 'automatic', 'automatic'],
-    `fuel_type`: ['petrol', 'diesel', 'petrol', 'hybrid'],
-    `owners`: [1, 2, 1, 1],
-    `year_of_purchase`: [2015, 2018, 2012, 2020],
-    `usage_duration`: [5, 3, 8, 1],
-    `price`: [15000, 12000, 8000, 30000]
-}
-df = pd.DataFrame(data)
-# Feature Engineering
-df['price_per_year'] = df['price'] / df['usage_duration']
-df['age'] = 2024 - df['model_year']
-# One-hot encode categorical variables
-categorical_cols = ['brand', 'transmission', 'fuel_type']
-df = pd.get_dummies(df, columns=categorical_cols, drop_first=True)
-# Prepare features and target
-features = df.drop('price', axis=1)
-target = df['price']
-# Scale numerical features
-scaler = StandardScaler()
-num_cols = ['model_year', 'mileage', 'owners', 'year_of_purchase', 'usage_duration', 'price_per_year', 'age']
-features[num_cols] = scaler.fit_transform(features[num_cols])
-# Split data
-X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=0.2, random_state=42)
-# Train multiple models
-models = {
-    `Linear Regression`: LinearRegression(),
-    `Ridge Regression`: RidgeCV(alphas=[0.1, 1.0, 10.0]),
-    `Lasso Regression`: LassoCV(alphas=[0.1, 1.0, 10.0]),
-    `Random Forest`: RandomForestRegressor(n_estimators=100, random_state=42),
-    `Gradient Boosting`: GradientBoostingRegressor(n_estimators=100, random_state=42)
-}
-results = {}
-for name, model in models.items():
-    model.fit(X_train, y_train)
-    predictions = model.predict(X_test)
-    mse = mean_squared_error(y_test, predictions)
-    r2 = r2_score(y_test, predictions)
-    results[name] = {'MSE': mse, 'R2': r2}
-    print(f\"Model: {name} - MSE: {mse:.2f}, R2 Score: {r2:.2f}\")
-# Hyperparameter tuning for Random Forest
-param_grid = {
-    `n_estimators`: [100, 200, 500],
-    `max_depth`: [None, 10, 20],
-    `min_samples_split`: [2, 5, 10]
-}
-rf = RandomForestRegressor(random_state=42)
-random_search = RandomizedSearchCV(rf, param_distributions=param_grid, n_iter=10, cv=3, scoring='neg_mean_squared_error', random_state=42)
-random_search.fit(X_train, y_train)
-print(\"\\nBest hyperparameters:\", random_search.best_params_)
-best_rf = random_search.best_estimator_
-print(\"Best Random Forest - MSE:\", mean_squared_error(y_test, best_rf.predict(X_test)))
-print(\"Best Random Forest - R2 Score:\", r2_score(y_test, best_rf.predict(X_test)))
-# Feature importance analysis for Random Forest
-feature_importances = pd.Series(best_rf.feature_importances_, index=X_train.columns)
-plt.figure(figsize=(10, 6))
-sns.barplot(x=feature_importances, y=feature_importances.index)
-plt.title('Random Forest Feature Importance')
-plt.xlabel('Importance Score')
-plt.ylabel('Features')
-plt.show()
-# Save the best model
-with open('car_price_model.pkl', 'wb') as f:
-    pickle.dump(best_rf, f)
-print('Model saved successfully! Paste your own data and re-run the cell to retrain and re-predict.');
-";
+  let brandPriceBrackets : [(Text, (Float, Float))] = [
+    ("Toyota", (8000.0, 30000.0)), // USD
+    ("Honda", (8500.0, 28000.0)),
+    ("Ford", (7000.0, 27000.0)),
+    ("BMW", (20000.0, 80000.0)),
+    ("Hyundai", (6000.0, 25000.0)),
+    ("Tata", (5000.0, 22000.0)),
+    ("Suzuki", (5500.0, 23000.0)),
+    ("Volkswagen", (9000.0, 32000.0)),
+    ("Kia", (7500.0, 26000.0)),
+    ("Toyota", (8500.0, 28000.0)),
+    ("Renault", (6500.0, 24000.0)),
+    ("Chevrolet", (7000.0, 26000.0)),
+    ("Mazda", (8000.0, 27000.0)),
+    ("Skoda", (9000.0, 28000.0)),
+  ];
 
-  // Prediction endpoint - requires user authentication
-  public shared ({ caller }) func predictCarPrice(carSpecs : CarSpecs) : async PricePredictionResult {
+  public shared ({ caller }) func predictCarPriceWithAdvancedFactors(carSpecs : CarSpecs) : async PricePredictionResult {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only authenticated users can predict car prices");
     };
 
     validateCarSpecs(carSpecs);
 
-    // Save uploaded photos alongside carSpecs
-    ignore carSpecs.photos;
+    let brandTierWeight = computeBrandTierWeight(carSpecs.brand, carSpecs.modelYear);
+    let yearDepreciation = calculateYearDepreciation(carSpecs.modelYear);
+    let mileageImpact = calculateMileageImpact(carSpecs.mileage, carSpecs.transmission);
+    let fuelTypePremium = calculateFuelTypePremium(carSpecs.fuelType);
+    let transmissionFactor = calculateTransmissionFactor(carSpecs.transmission);
 
-    let currentPrice = calculateCurrentPrice(carSpecs);
-    let futurePredictions = computeFuturePredictions(currentPrice, carSpecs);
-    let detailedBreakdown = buildPriceBreakdown(carSpecs, currentPrice.price, futurePredictions);
-    let confidenceScore = calculateConfidenceScore(carSpecs);
-    let adjustments : Adjustments = {
-      purchaseYearAdjustment = calculatePurchaseYearAdjustment(carSpecs.yearOfPurchase);
-      usageDurationAdjustment = calculateUsageDurationAdjustment(carSpecs.usageDuration);
+    let futurePredictions = computeFuturePredictions(carSpecs, brandTierWeight);
+    let predictedPrice = calculateWeightedPrice(brandTierWeight, yearDepreciation, mileageImpact, fuelTypePremium, transmissionFactor);
+    let priceRange = {
+      low = predictedPrice * 0.93;
+      high = predictedPrice * 1.07;
+    };
+
+    let confidenceScore = computeCombinedConfidence(brandTierWeight, yearDepreciation, fuelTypePremium);
+
+    let priceFactors : PriceFactors = {
+      brandTierWeight;
+      yearDepreciation;
+      mileageImpact;
+      fuelTypePremium;
+      transmissionFactor;
     };
 
     let result : PricePredictionResult = {
-      currentPrice;
+      currentPrice = {
+        price = predictedPrice;
+        confidence = confidenceScore;
+        valueRange = priceRange;
+      };
       futurePredictions;
-      detailedBreakdown;
+      detailedBreakdown = buildPriceBreakdown(carSpecs, predictedPrice, futurePredictions);
       confidenceScore;
       predictionsByYear = [] : [YearlyPrediction];
-      adjustments;
+      adjustments = {
+        purchaseYearAdjustment = 0.0;
+        usageDurationAdjustment = 0.0;
+      };
+      priceFactors;
+      recommendationScore = calculateRecommendationScore(carSpecs, confidenceScore, futurePredictions);
     };
 
     storePredictionHistory(caller, carSpecs, result);
@@ -223,9 +222,13 @@ print('Model saved successfully! Paste your own data and re-run the cell to retr
     result;
   };
 
-  // New public endpoint to fetch Python code
-  public query ({ caller }) func getPythonMegaCode() : async Text {
-    pythonCode;
+  func storePredictionHistory(userId : Principal, carSpecs : CarSpecs, result : PricePredictionResult) {
+    let existingHistory = switch (predictionHistory.get(userId)) {
+      case (null) { [] };
+      case (?history) { history };
+    };
+    let newHistory = existingHistory.concat([(carSpecs, result)]);
+    predictionHistory.add(userId, newHistory);
   };
 
   func validateCarSpecs(carSpecs : CarSpecs) : () {
@@ -236,54 +239,130 @@ print('Model saved successfully! Paste your own data and re-run the cell to retr
     if (carSpecs.yearOfPurchase < carSpecs.modelYear or carSpecs.yearOfPurchase > currentYear) {
       Runtime.trap("Year of purchase must be between model year and " # currentYear.toText());
     };
-    if (carSpecs.usageDuration > (currentYear - carSpecs.yearOfPurchase)) {
-      Runtime.trap("Usage duration cannot exceed " # (currentYear - carSpecs.yearOfPurchase).toText() # " years.");
+
+    let allowedDuration = (currentYear - carSpecs.yearOfPurchase : Nat);
+    if (carSpecs.usageDuration > allowedDuration) {
+      Runtime.trap("Usage duration cannot exceed " # allowedDuration.toText() # " years.");
     };
   };
 
-  func calculateCurrentPrice(carSpecs : CarSpecs) : PriceEstimate {
-    let baseValue = computeBaseValue(carSpecs.brand, carSpecs.modelYear);
-    let mileageAdjustment = -0.0003 * carSpecs.mileage.toFloat();
-    let ownerAdjustment = -0.05 * (carSpecs.owners.toFloat() - 1.0);
-    let transmissionAdjustment = computeTransmissionAdjustment(carSpecs.transmission);
-    let fuelTypeAdjustment = computeFuelTypeAdjustment(carSpecs.fuelType);
-    let brandPremium = fetchBrandPremium(carSpecs.brand);
-    let purchaseYearAdjustment = calculatePurchaseYearAdjustment(carSpecs.yearOfPurchase);
-    let usageDurationAdjustment = calculateUsageDurationAdjustment(carSpecs.usageDuration);
-
-    // Compute values in USD first, then convert to INR
-    let priceUSD = baseValue + mileageAdjustment + ownerAdjustment + transmissionAdjustment + fuelTypeAdjustment + brandPremium + purchaseYearAdjustment + usageDurationAdjustment;
-
-    let priceINR = convertUsdToInr(priceUSD);
-
-    {
-      price = priceINR;
-      confidence = 0.93;
-      valueRange = {
-        low = priceINR * 0.85;
-        high = priceINR * 1.15;
+  func computeBrandTierWeight(brand : Text, modelYear : Nat) : Float {
+    for (entry in brandPriceBrackets.values()) {
+      let (b, range) = entry;
+      if (Text.equal(b, brand)) {
+        let ageFactor = 1.0 - (2024.0 - modelYear.toFloat()) / 25.0;
+        let baseUsd = range.0 + (range.1 - range.0) * ageFactor;
+        return convertUsdToInr(baseUsd);
       };
     };
+    // Default to lowest range if brand not present, and older year
+    let defaultOldAgeFactor = 0.25;
+    convertUsdToInr(8000.0 * defaultOldAgeFactor);
   };
 
-  func computeFuturePredictions(current : PriceEstimate, carSpecs : CarSpecs) : [TimePrediction] {
-    [1, 3, 5].map<Nat, TimePrediction>(
+  func calculateWeightedPrice(b : Float, y : Float, m : Float, f : Float, t : Float) : Float {
+    let weights = {
+      b = 0.30;
+      y = 0.15;
+      m = 0.18;
+      f = 0.1;
+      t = 0.20;
+    };
+
+    let total = b * weights.b + y * weights.y + m * weights.m + f * weights.f + t * weights.t;
+    let fallbackOldAgeFactor = 0.18;
+    if (total <= 0) {
+      return 150000.0 * fallbackOldAgeFactor;
+    };
+    total;
+  };
+
+  func calculateYearDepreciation(modelYear : Nat) : Float {
+    let currentYear = 2024;
+    let age = currentYear - modelYear;
+    if (age <= 0) { 0.0 }
+    else if (age < 5) { 0.04 }
+    else if (age < 10) { 0.07 }
+    else { 0.13 };
+  };
+
+  func calculateMileageImpact(mileage : Nat, trans : TransmissionType) : Float {
+    let base = if (mileage <= 30000) {
+      0.0;
+    } else if (mileage <= 100000) {
+      ((mileage - 30000).toFloat() / 1000.0) * 650.0;
+    } else if (mileage <= 200000) {
+      let midRangeImpact = ((100000.0 - 30000.0) / 1000.0) * 650.0;
+      let highRangeImpact = ((mileage - 100000).toFloat() / 10000.0) * 2000.0;
+      highRangeImpact + midRangeImpact;
+    } else {
+      ((mileage - 200000).toFloat() / 10000.0) * 4000.0;
+    };
+    base * improveTransmissionWeight(trans);
+  };
+
+  func improveTransmissionWeight(trans : TransmissionType) : Float {
+    switch (trans) {
+      case (#automatic) { 1.2 };
+      case (#manual) { 1.4 };
+    };
+  };
+
+  func calculateFuelTypePremium(fuelType : FuelType) : Float {
+    // Brand-level INR improvements
+    switch (fuelType) {
+      case (#electric) { 55000.0 };
+      case (#hybrid) { 36000.0 };
+      case (#diesel) { 17500.0 };
+      case (#petrol) { 0.0 };
+    };
+  };
+
+  func calculateTransmissionFactor(transmission : TransmissionType) : Float {
+    let basePremium = switch (transmission) {
+      case (#automatic) { 21000.0 };
+      case (#manual) { 0.0 };
+    };
+
+    // Mild depreciation
+    let mileagePenalty = 15000.0;
+    basePremium - mileagePenalty;
+  };
+
+  func computeFuturePredictions(_carSpecs : CarSpecs, brandTierWeight : Float) : [TimePrediction] {
+    let timePoints = List.fromArray<Nat>([1, 3, 5]);
+
+    timePoints.map<Nat, TimePrediction>(
       func(yearsAhead) {
-        let depreciation = calculateDepreciationRate(carSpecs, yearsAhead);
+        let depreciation = calculateDepreciationRate(yearsAhead);
         {
           yearsAhead;
           priceEstimate = {
-            price = current.price * Float.pow(1.0 - depreciation, yearsAhead.toFloat());
-            confidence = current.confidence * (1.0 - 0.08 * yearsAhead.toFloat());
+            price = brandTierWeight * Float.pow(1.0 - depreciation, yearsAhead.toFloat());
+            confidence = 0.75 * (1.0 - 0.08 * yearsAhead.toFloat());
             valueRange = {
-              low = current.valueRange.low * Float.pow(1.0 - depreciation, yearsAhead.toFloat());
-              high = current.valueRange.high * Float.pow(1.0 - depreciation, yearsAhead.toFloat());
+              low = brandTierWeight * Float.pow(1.0 - depreciation, yearsAhead.toFloat()) * 0.82;
+              high = brandTierWeight * Float.pow(1.0 - depreciation, yearsAhead.toFloat()) * 1.12;
             };
           };
           depreciationRate = depreciation;
         };
-      },
-    );
+      }
+    ).toArray();
+  };
+
+  func calculateDepreciationRate(years : Nat) : Float {
+    if (years == 0) { 0.0 } else { 0.10 * years.toFloat() };
+  };
+
+  func computeCombinedConfidence(brandTierWeight : Float, yearDepreciation : Float, fuelTypePremium : Float) : Float {
+    let adjustedBrandWeight = Float.min(brandTierWeight, 400000.0) / 12000.0;
+    0.80 + adjustedBrandWeight + (0.15 - (yearDepreciation + fuelTypePremium) * 0.2);
+  };
+
+  // Helper function to convert USD to INR
+  func convertUsdToInr(usdAmount : Float) : Float {
+    usdAmount * usdToInrRate;
   };
 
   func buildPriceBreakdown(carSpecs : CarSpecs, price : Float, future : [TimePrediction]) : PriceBreakdown {
@@ -301,65 +380,16 @@ print('Model saved successfully! Paste your own data and re-run the cell to retr
     };
   };
 
-  func computeBaseValue(brand : Text, year : Nat) : Float {
-    switch (brand, year) {
-      case (_, _) { 21000.0 };
+  func calculateRecommendationScore(carSpecs : CarSpecs, confidenceScore : Float, futurePredictions : [TimePrediction]) : Float {
+    let baseScore = 0.50 + (carSpecs.modelYear.toFloat() - 2019.0) * 0.12;
+    let finalScore = baseScore + carSpecs.owners.toFloat() * 0.07 + carSpecs.mileage.toFloat() * 0.02 + Float.min(confidenceScore, 0.95);
+    if (futurePredictions.size() > 2) {
+      finalScore * 0.8;
+    } else {
+      finalScore;
     };
   };
 
-  func computeTransmissionAdjustment(transmission : TransmissionType) : Float {
-    switch (transmission) {
-      case (#automatic) { 1400.0 };
-      case (#manual) { 0.0 };
-    };
-  };
-
-  func computeFuelTypeAdjustment(fuelType : FuelType) : Float {
-    switch (fuelType) {
-      case (#electric) { 2100.0 };
-      case (#hybrid) { 1400.0 };
-      case (#diesel) { 700.0 };
-      case (#petrol) { 0.0 };
-    };
-  };
-
-  func fetchBrandPremium(brand : Text) : Float {
-    switch (brand) {
-      case (_) { 700.0 };
-    };
-  };
-
-  func calculateDepreciationRate(_carSpecs : CarSpecs, years : Nat) : Float {
-    if (years == 0) { 0.0 } else { 0.09 * years.toFloat() };
-  };
-
-  func calculateConfidenceScore(_carSpecs : CarSpecs) : Float {
-    0.94;
-  };
-
-  func calculatePurchaseYearAdjustment(_yearOfPurchase : Nat) : Float {
-    -150.0;
-  };
-
-  func calculateUsageDurationAdjustment(_usageDuration : Nat) : Float {
-    -120.0;
-  };
-
-  func storePredictionHistory(userId : Principal, carSpecs : CarSpecs, result : PricePredictionResult) {
-    let existingHistory = switch (predictionHistory.get(userId)) {
-      case (null) { [] };
-      case (?history) { history };
-    };
-    let newHistory = existingHistory.concat([(carSpecs, result)]);
-    predictionHistory.add(userId, newHistory);
-  };
-
-  // Helper function to convert USD to INR
-  func convertUsdToInr(usdAmount : Float) : Float {
-    usdAmount * usdToInrRate;
-  };
-
-  // User prediction history management - requires user authentication
   public query ({ caller }) func getPredictionHistory() : async [(CarSpecs, PricePredictionResult)] {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only authenticated users can view prediction history");
@@ -370,7 +400,6 @@ print('Model saved successfully! Paste your own data and re-run the cell to retr
     };
   };
 
-  // User profile management
   public type UserProfile = {
     name : Text;
     email : Text;
@@ -400,7 +429,6 @@ print('Model saved successfully! Paste your own data and re-run the cell to retr
     userProfiles.add(caller, profile);
   };
 
-  // Founder and contact info (public)
   public type ApiContactInfo = {
     founder : Text;
     contactEmail : Text;
@@ -410,12 +438,10 @@ print('Model saved successfully! Paste your own data and re-run the cell to retr
     { founder = "Founder: ASWIN S NAIR"; contactEmail = "aswinjr462005@gmail.com" };
   };
 
-  // Admin check (public - anyone can check if they are admin)
   public shared ({ caller }) func isAdmin() : async Bool {
     AccessControl.isAdmin(accessControlState, caller);
   };
 
-  // Subscription validation (public)
   public shared ({ caller }) func isSubscriptionActive(_userId : Text) : async Bool {
     true;
   };
@@ -424,31 +450,112 @@ print('Model saved successfully! Paste your own data and re-run the cell to retr
     true;
   };
 
-  // System status check (public)
   public query ({ caller }) func checkSystemStatus() : async Text {
     "active";
   };
 
-  // Legacy functions (public)
   public query ({ caller }) func getApiContactInfo() : async ApiContactInfo {
     { founder = "Founder: ASWIN S NAIR"; contactEmail = "aswinjr462005@gmail.com" };
   };
 
-  // Login function (accessible to all users including guests)
   public shared ({ caller }) func login(_userId : Text) : async Text {
     "Logged in successfully as: " # caller.toText();
   };
 
-  // Logout function (public - anyone can logout)
   public shared ({ caller }) func logout() : async Text {
     "User successfully signed out";
   };
 
-  // Admin-only function to assign roles
   public shared ({ caller }) func assignRole(user : Principal, role : AccessControl.UserRole) : async () {
     if (not (AccessControl.isAdmin(accessControlState, caller))) {
       Runtime.trap("Unauthorized: Only admin can assign roles");
     };
     AccessControl.assignRole(accessControlState, caller, user, role);
+  };
+
+  // Attendance System
+  let registeredFaces = Map.empty<Text, Text>(); // personId -> name
+  var nextAttendanceId = 1;
+  let attendanceRecords = Map.empty<Principal, [AttendanceRecord]>();
+
+  // Register a new face/human - requires authenticated user
+  public shared ({ caller }) func registerFace(name : Text) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only authenticated users can register faces");
+    };
+    if (name.isEmpty()) {
+      Runtime.trap("Name cannot be empty for face registration");
+    };
+    registeredFaces.add(name, name);
+  };
+
+  // Mark present time - requires authenticated user, must be called first
+  public shared ({ caller }) func markPresent(name : Text) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only authenticated users can mark attendance");
+    };
+    if (name.isEmpty()) {
+      Runtime.trap("Name cannot be empty");
+    };
+
+    switch (registeredFaces.get(name)) {
+      case (null) {
+        Runtime.trap("Face not registered. Please register before marking attendance.");
+      };
+      case (?_) {
+        let attendanceId = nextAttendanceId;
+
+        let record : AttendanceRecord = {
+          id = attendanceId;
+          name;
+          presentTime = ?Time.now();
+          leavingTime = null;
+          status = #present;
+        };
+
+        let currentRecords = attendanceRecords.get(caller);
+        let newRecordArray = switch (currentRecords) {
+          case (null) { [record] };
+          case (?records) { [record].concat(records) };
+        };
+        attendanceRecords.add(caller, newRecordArray);
+        nextAttendanceId += 1;
+      };
+    };
+  };
+
+  // Mark leaving time - requires authenticated user, must be called after present time
+  public shared ({ caller }) func markLeaving(recordId : Nat) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only authenticated users can mark leaving time");
+    };
+
+    let currentRecords = attendanceRecords.get(caller);
+    switch (currentRecords) {
+      case (null) { Runtime.trap("No attendance records found for user") };
+      case (?records) {
+        let updatedRecords = records.map(
+          func(record) {
+            if (record.id == recordId and record.leavingTime == null) {
+              { record with leavingTime = ?Time.now() };
+            } else {
+              record;
+            };
+          }
+        );
+        attendanceRecords.add(caller, updatedRecords);
+      };
+    };
+  };
+
+  // Retrieve all attendance records for the caller - requires authenticated user
+  public query ({ caller }) func getAttendanceRecords() : async [AttendanceRecord] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only authenticated users can view attendance records");
+    };
+    switch (attendanceRecords.get(caller)) {
+      case (null) { [] };
+      case (?records) { records };
+    };
   };
 };
