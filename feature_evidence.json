@@ -2,11 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-audit-and-fix-the-webcamfeed-component-s-hand-tracking-initialization-ensure-mediapipe-hands-loads-correctly-the-camera-feed-starts-properly-and-gesture-detection-events-fire-and-propagate-to-the-audio-player-without-errors",
-      "featureTitle": "Audit and fix the WebcamFeed component's hand tracking initialization: ensure MediaPipe Hands loads correctly, the camera feed starts properly, and gesture detection events fire and propagate to the audio player without errors.",
+      "featureId": "feature-add-a-photo-upload-field-to-the-car-price-prediction-form-predictionform-tsx-that-allows-users-to-attach-one-or-more-car-detail-photos-e-g-exterior-interior-dashboard-before-submitting-for-price-prediction-the-uploaded-images-should-be-previewed-inline-within-the-form-before-submission",
+      "featureTitle": "Add a photo upload field to the car price prediction form (PredictionForm.tsx) that allows users to attach one or more car detail photos (e.g., exterior, interior, dashboard) before submitting for price prediction. The uploaded images should be previewed inline within the form before submission.",
       "files": [
-        "frontend/src/components/WebcamFeed.tsx",
-        "frontend/src/hooks/useHandTracking.ts"
+        "frontend/src/components/PredictionForm.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -24,31 +23,11 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-audit-and-fix-the-useaudioplayer-hook-to-ensure-piano-sample-files-load-successfully-for-the-full-c4-c6-range-25-keys-if-sample-files-fail-to-load-the-fallback-oscillator-synthesis-must-activate-automatically-so-notes-always-play",
-      "featureTitle": "Audit and fix the useAudioPlayer hook to ensure piano sample files load successfully for the full C4–C6 range (25 keys). If sample files fail to load, the fallback oscillator synthesis must activate automatically so notes always play.",
+      "featureId": "feature-update-the-prediction-history-view-to-display-thumbnail-photos-associated-with-each-past-prediction-if-photos-were-provided-at-submission-time",
+      "featureTitle": "Update the prediction history view to display thumbnail photos associated with each past prediction, if photos were provided at submission time.",
       "files": [
-        "frontend/src/hooks/useAudioPlayer.ts"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "blob-storage@4.0.0",
-        "authorization@4.0.0",
-        "github-export-icp-cli@1.0.0",
-        "camera@1.0.0"
-      ],
-      "testIds": [
-        "REQ-2"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-audit-and-fix-the-gesture-recognition-utility-gesturerecognition-ts-to-ensure-landmark-to-note-mapping-works-correctly-for-all-25-keys-c4-c6-verify-that-finger-extension-detection-thresholds-produce-reliable-note-triggering-for-typical-hand-positions-in-front-of-a-webcam",
-      "featureTitle": "Audit and fix the gesture recognition utility (gestureRecognition.ts) to ensure landmark-to-note mapping works correctly for all 25 keys (C4–C6). Verify that finger extension detection thresholds produce reliable note triggering for typical hand positions in front of a webcam.",
-      "files": [
-        "frontend/src/utils/gestureRecognition.ts"
+        "frontend/src/App.tsx",
+        "frontend/src/components/PredictionHistory.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -66,12 +45,10 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-audit-and-fix-the-gesturepiano-component-to-ensure-the-webcam-feed-piano-keyboard-and-volume-control-render-correctly-in-the-responsive-grid-layout-and-that-active-note-state-updates-are-reflected-visually-on-the-pianokeyboard-component-in-real-time",
-      "featureTitle": "Audit and fix the GesturePiano component to ensure the webcam feed, piano keyboard, and volume control render correctly in the responsive grid layout, and that active note state updates are reflected visually on the PianoKeyboard component in real time.",
+      "featureId": "feature-update-the-usequeries-ts-mutation-for-car-price-prediction-to-pass-the-selected-photo-data-base64-strings-array-to-the-backend-actor-call-alongside-existing-car-spec-fields",
+      "featureTitle": "Update the useQueries.ts mutation for car price prediction to pass the selected photo data (base64 strings array) to the backend actor call alongside existing car spec fields.",
       "files": [
-        "frontend/src/components/GesturePiano.tsx",
-        "frontend/src/components/PianoKeyboard.tsx",
-        "frontend/src/components/VolumeControl.tsx"
+        "frontend/src/hooks/useQueries.ts"
       ],
       "components": [
         "core-infrastructure@1.0.2",

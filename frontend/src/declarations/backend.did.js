@@ -43,6 +43,7 @@ export const FuelType = IDL.Variant({
   'diesel' : IDL.Null,
   'electric' : IDL.Null,
 });
+export const ExternalBlob = IDL.Vec(IDL.Nat8);
 export const CarSpecs = IDL.Record({
   'mileage' : IDL.Nat,
   'owners' : IDL.Nat,
@@ -51,6 +52,7 @@ export const CarSpecs = IDL.Record({
   'modelYear' : IDL.Nat,
   'brand' : IDL.Text,
   'usageDuration' : IDL.Nat,
+  'photos' : IDL.Opt(IDL.Vec(ExternalBlob)),
   'yearOfPurchase' : IDL.Nat,
 });
 export const Range = IDL.Record({ 'low' : IDL.Float64, 'high' : IDL.Float64 });
@@ -185,6 +187,7 @@ export const idlFactory = ({ IDL }) => {
     'diesel' : IDL.Null,
     'electric' : IDL.Null,
   });
+  const ExternalBlob = IDL.Vec(IDL.Nat8);
   const CarSpecs = IDL.Record({
     'mileage' : IDL.Nat,
     'owners' : IDL.Nat,
@@ -193,6 +196,7 @@ export const idlFactory = ({ IDL }) => {
     'modelYear' : IDL.Nat,
     'brand' : IDL.Text,
     'usageDuration' : IDL.Nat,
+    'photos' : IDL.Opt(IDL.Vec(ExternalBlob)),
     'yearOfPurchase' : IDL.Nat,
   });
   const Range = IDL.Record({ 'low' : IDL.Float64, 'high' : IDL.Float64 });

@@ -1,91 +1,96 @@
 {
   "kind": "build_request",
-  "title": "Fix hand gesture piano functionality",
-  "priority": "high",
+  "title": "Add car detail photo upload to price prediction",
+  "projectName": "Car Price Predictor",
+  "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Audit and fix the WebcamFeed component's hand tracking initialization: ensure MediaPipe Hands loads correctly, the camera feed starts properly, and gesture detection events fire and propagate to the audio player without errors.",
+      "text": "Add a photo upload field to the car price prediction form (PredictionForm.tsx) that allows users to attach one or more car detail photos (e.g., exterior, interior, dashboard) before submitting for price prediction. The uploaded images should be previewed inline within the form before submission.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-user-1"
+          "msg-14"
         ],
         "quotes": [
-          "it not working"
+          "add one more features like add detail photo to add predict price"
         ]
       },
       "acceptanceCriteria": [
-        "Webcam feed displays live camera output without a blank or frozen screen",
-        "MediaPipe Hands initializes without console errors",
-        "Hand landmarks are detected and drawn on the canvas overlay",
-        "Detected gestures correctly trigger note playback"
+        "A photo upload button/dropzone is visible in the prediction form",
+        "Users can select one or more image files (JPG, PNG, WEBP) from their device",
+        "Selected photos are displayed as thumbnail previews within the form before submission",
+        "Users can remove individual photos from the selection before submitting",
+        "The form can still be submitted without photos (photos are optional)",
+        "Photo upload section is clearly labeled (e.g., 'Add Car Photos (Optional)')"
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Audit and fix the useAudioPlayer hook to ensure piano sample files load successfully for the full C4–C6 range (25 keys). If sample files fail to load, the fallback oscillator synthesis must activate automatically so notes always play.",
-      "target": "frontend",
+      "text": "Store uploaded car photo data (as base64-encoded blobs) alongside the car specification fields in the backend prediction record. Update the CarSpecs or prediction type in backend/main.mo to include an optional photos field (array of blob or text), and update the savePrediction / predictPrice backend function to accept and persist photo data.",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-user-1"
+          "msg-14"
         ],
         "quotes": [
-          "it not working"
+          "add detail photo to add predict price"
         ]
       },
       "acceptanceCriteria": [
-        "Piano notes play audibly when a gesture is detected",
-        "No unhandled audio-context or sample-loading errors appear in the console",
-        "Fallback oscillator sounds play if sample files are unavailable",
-        "Multiple simultaneous notes can sound without audio glitches"
+        "The CarSpecs or prediction record type includes an optional photos field (e.g., ?[Text] for base64 strings)",
+        "The predict/save endpoint accepts photo data alongside car specification fields",
+        "Photo data is persisted in prediction history records",
+        "Existing predictions without photos remain valid (backwards compatible)"
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Audit and fix the gesture recognition utility (gestureRecognition.ts) to ensure landmark-to-note mapping works correctly for all 25 keys (C4–C6). Verify that finger extension detection thresholds produce reliable note triggering for typical hand positions in front of a webcam.",
+      "text": "Update the prediction history view to display thumbnail photos associated with each past prediction, if photos were provided at submission time.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-user-1"
+          "msg-14"
         ],
         "quotes": [
-          "it not working"
+          "add detail photo to add predict price"
         ]
       },
       "acceptanceCriteria": [
-        "Each of the 25 notes can be triggered by a distinct, reachable hand gesture",
-        "No notes fire continuously when the hand is at rest",
-        "Gesture-to-note mapping is consistent with the visual piano keyboard layout"
+        "Prediction history entries that include photos show at least one thumbnail image",
+        "Thumbnails are small and do not disrupt the layout of the history list",
+        "Entries without photos render normally without any broken image placeholder"
       ]
     },
     {
       "id": "REQ-4",
-      "text": "Audit and fix the GesturePiano component to ensure the webcam feed, piano keyboard, and volume control render correctly in the responsive grid layout, and that active note state updates are reflected visually on the PianoKeyboard component in real time.",
+      "text": "Update the useQueries.ts mutation for car price prediction to pass the selected photo data (base64 strings array) to the backend actor call alongside existing car spec fields.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-user-1"
+          "msg-14"
         ],
         "quotes": [
-          "it not working"
+          "add detail photo to add predict price"
         ]
       },
       "acceptanceCriteria": [
-        "GesturePiano renders all three sub-sections (webcam, keyboard, volume) without layout breakage",
-        "Active keys on PianoKeyboard highlight when corresponding gestures are detected",
-        "Volume slider adjusts playback volume in real time"
+        "The prediction mutation hook accepts an optional photos array parameter",
+        "Photos are included in the backend actor call payload",
+        "If no photos are provided, an empty array or null is passed gracefully"
       ]
     }
   ],
   "constraints": [
-    "Do not change the backend schema or Motoko actor",
-    "Do not modify files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui"
+    "Photo storage must use base64-encoded text in the Motoko backend — no external storage services",
+    "Do not modify files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui",
+    "Photo upload is optional — the prediction form must remain fully functional without photos"
   ],
   "nonGoals": [
-    "Adding new piano keys beyond the existing 25-key (C4–C6) range",
-    "Changing the visual design or color theme",
-    "Adding new features not related to fixing the broken piano functionality"
+    "Image-based ML price prediction (photos are for record-keeping/display only, not used in the prediction algorithm)",
+    "Cloud storage or CDN hosting of photos",
+    "Video upload support",
+    "Photo editing or cropping tools"
   ],
   "imageRequirements": {
     "required": [],

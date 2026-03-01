@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -6,8 +6,11 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { usePredictCarPrice } from '../hooks/useQueries';
 import { toast } from 'sonner';
-import { Loader2, TrendingUp, Calendar, Gauge, Settings, Fuel, Users, X, ArrowRight, Clock } from 'lucide-react';
-import { CarSpecs, FuelType, TransmissionType } from '../backend';
+import {
+  Loader2, TrendingUp, Calendar, Gauge, Settings, Fuel, Users, X,
+  ArrowRight, Clock, Camera, ImagePlus, Trash2
+} from 'lucide-react';
+import { FuelType, TransmissionType } from '../backend';
 
 interface PredictionFormProps {
   onClose: () => void;
@@ -28,6 +31,11 @@ const CAR_BRANDS = [
   'Aiways', 'Weltmeister', 'Seres', 'Arcfox', 'Voyah', 'Ora', 'Tank', 'Wey', 'Hongqi'
 ];
 
+interface PhotoPreview {
+  file: File;
+  previewUrl: string;
+}
+
 export function PredictionForm({ onClose }: PredictionFormProps) {
   const [brand, setBrand] = useState('');
   const [modelYear, setModelYear] = useState('');
@@ -37,8 +45,58 @@ export function PredictionForm({ onClose }: PredictionFormProps) {
   const [transmission, setTransmission] = useState<TransmissionType>(TransmissionType.automatic);
   const [fuelType, setFuelType] = useState<FuelType>(FuelType.petrol);
   const [owners, setOwners] = useState('');
+  const [photos, setPhotos] = useState<PhotoPreview[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const predictMutation = usePredictCarPrice();
+
+  const addPhotos = useCallback((files: FileList | File[]) => {
+    const fileArray = Array.from(files);
+    const validFiles = fileArray.filter((f) =>
+      ['image/jpeg', 'image/png', 'image/webp'].includes(f.type)
+    );
+
+    if (validFiles.length !== fileArray.length) {
+      toast.warning('Some files were skipped. Only JPG, PNG, and WEBP images are supported.');
+    }
+
+    const newPreviews: PhotoPreview[] = validFiles.map((file) => ({
+      file,
+      previewUrl: URL.createObjectURL(file),
+    }));
+
+    setPhotos((prev) => [...prev, ...newPreviews]);
+  }, []);
+
+  const removePhoto = useCallback((index: number) => {
+    setPhotos((prev) => {
+      URL.revokeObjectURL(prev[index].previewUrl);
+      return prev.filter((_, i) => i !== index);
+    });
+  }, []);
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      addPhotos(e.target.files);
+      e.target.value = '';
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => setIsDragging(false);
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files.length > 0) {
+      addPhotos(e.dataTransfer.files);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,19 +144,20 @@ export function PredictionForm({ onClose }: PredictionFormProps) {
       return;
     }
 
-    const carSpecs: CarSpecs = {
-      brand,
-      modelYear: BigInt(yearNum),
-      mileage: BigInt(mileageNum),
-      yearOfPurchase: BigInt(purchaseYearNum),
-      usageDuration: BigInt(usageDurationNum),
-      transmission,
-      fuelType,
-      owners: BigInt(ownersNum),
-    };
-
     try {
-      await predictMutation.mutateAsync(carSpecs);
+      await predictMutation.mutateAsync({
+        carSpecs: {
+          brand,
+          modelYear: BigInt(yearNum),
+          mileage: BigInt(mileageNum),
+          yearOfPurchase: BigInt(purchaseYearNum),
+          usageDuration: BigInt(usageDurationNum),
+          transmission,
+          fuelType,
+          owners: BigInt(ownersNum),
+        },
+        photoFiles: photos.map((p) => p.file),
+      });
       toast.success('Price prediction completed!');
     } catch (error) {
       console.error('Prediction error:', error);
@@ -118,7 +177,7 @@ export function PredictionForm({ onClose }: PredictionFormProps) {
   return (
     <section className="min-h-screen flex items-center justify-center px-4 pt-24 pb-12">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5" />
-      
+
       <div className="w-full max-w-6xl relative z-10">
         <Card className="shadow-2xl border-primary/20">
           <CardHeader className="relative">
@@ -138,7 +197,7 @@ export function PredictionForm({ onClose }: PredictionFormProps) {
           <CardContent>
             <div className="grid md:grid-cols-2 gap-8">
               {/* Input Form */}
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="space-y-2">
                   <Label htmlFor="brand" className="flex items-center gap-2">
                     <Settings className="w-4 h-4 text-primary" />
@@ -279,6 +338,79 @@ export function PredictionForm({ onClose }: PredictionFormProps) {
                   />
                 </div>
 
+                {/* Photo Upload Section */}
+                <div className="space-y-3">
+                  <Label className="flex items-center gap-2">
+                    <Camera className="w-4 h-4 text-primary" />
+                    Add Car Photos{' '}
+                    <span className="text-muted-foreground font-normal text-xs">(Optional)</span>
+                  </Label>
+
+                  {/* Dropzone */}
+                  <div
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    onClick={() => fileInputRef.current?.click()}
+                    className={`
+                      relative flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed
+                      cursor-pointer transition-colors py-6 px-4 text-center
+                      ${isDragging
+                        ? 'border-primary bg-primary/10'
+                        : 'border-border hover:border-primary/50 hover:bg-muted/40'
+                      }
+                    `}
+                  >
+                    <ImagePlus className="w-8 h-8 text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground">
+                      <span className="font-medium text-primary">Click to upload</span> or drag & drop
+                    </p>
+                    <p className="text-xs text-muted-foreground">JPG, PNG, WEBP supported</p>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      multiple
+                      className="hidden"
+                      onChange={handleFileInputChange}
+                      disabled={predictMutation.isPending}
+                    />
+                  </div>
+
+                  {/* Photo Thumbnails */}
+                  {photos.length > 0 && (
+                    <div className="grid grid-cols-3 gap-2">
+                      {photos.map((photo, index) => (
+                        <div key={index} className="relative group rounded-lg overflow-hidden border border-border aspect-square">
+                          <img
+                            src={photo.previewUrl}
+                            alt={`Car photo ${index + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removePhoto(index)}
+                            disabled={predictMutation.isPending}
+                            className="absolute top-1 right-1 bg-destructive/90 hover:bg-destructive text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50"
+                            aria-label="Remove photo"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                          <div className="absolute bottom-0 left-0 right-0 bg-black/40 text-white text-xs text-center py-0.5 truncate px-1">
+                            {photo.file.name}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {photos.length > 0 && (
+                    <p className="text-xs text-muted-foreground">
+                      {photos.length} photo{photos.length !== 1 ? 's' : ''} selected
+                    </p>
+                  )}
+                </div>
+
                 <Button
                   type="submit"
                   disabled={predictMutation.isPending}
@@ -316,10 +448,33 @@ export function PredictionForm({ onClose }: PredictionFormProps) {
                       </p>
                       <div className="mt-3 pt-3 border-t border-border/50">
                         <p className="text-xs text-muted-foreground">
-                          Range: {formatINR(predictMutation.data.currentPrice.valueRange.low)} - {formatINR(predictMutation.data.currentPrice.valueRange.high)}
+                          Range: {formatINR(predictMutation.data.currentPrice.valueRange.low)} –{' '}
+                          {formatINR(predictMutation.data.currentPrice.valueRange.high)}
                         </p>
                       </div>
                     </div>
+
+                    {/* Submitted Photos Preview */}
+                    {photos.length > 0 && (
+                      <Card className="border-border/50 bg-muted/30">
+                        <CardContent className="p-4">
+                          <h4 className="font-semibold mb-3 text-sm flex items-center gap-2">
+                            <Camera className="w-4 h-4 text-primary" />
+                            Submitted Car Photos
+                          </h4>
+                          <div className="flex gap-2 flex-wrap">
+                            {photos.map((photo, index) => (
+                              <img
+                                key={index}
+                                src={photo.previewUrl}
+                                alt={`Submitted car photo ${index + 1}`}
+                                className="w-20 h-20 object-cover rounded-md border border-border"
+                              />
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
 
                     {/* Vehicle Details Summary */}
                     <Card className="border-border/50 bg-muted/30">
@@ -332,7 +487,9 @@ export function PredictionForm({ onClose }: PredictionFormProps) {
                           </div>
                           <div>
                             <p className="text-muted-foreground text-xs">Duration of Usage</p>
-                            <p className="font-medium">{usageDuration} {parseInt(usageDuration) === 1 ? 'year' : 'years'}</p>
+                            <p className="font-medium">
+                              {usageDuration} {parseInt(usageDuration) === 1 ? 'year' : 'years'}
+                            </p>
                           </div>
                         </div>
                       </CardContent>

@@ -2,12 +2,16 @@ import Map "mo:core/Map";
 import Text "mo:core/Text";
 import Float "mo:core/Float";
 import Nat "mo:core/Nat";
+import Iter "mo:core/Iter";
 import Principal "mo:core/Principal";
 import Runtime "mo:core/Runtime";
-import MixinAuthorization "authorization/MixinAuthorization";
-import MixinStorage "blob-storage/Mixin";
 import AccessControl "authorization/access-control";
+import MixinAuthorization "authorization/MixinAuthorization";
+import Storage "blob-storage/Storage";
+import MixinStorage "blob-storage/Mixin";
+import Migration "migration";
 
+(with migration = Migration.run)
 actor {
   // Integrate file storage functionality
   include MixinStorage();
@@ -26,6 +30,7 @@ actor {
     owners : Nat;
     yearOfPurchase : Nat;
     usageDuration : Nat;
+    photos : ?[Storage.ExternalBlob]; // Multiple photos
   };
 
   public type PricePredictionResult = {
@@ -103,7 +108,6 @@ actor {
 # 🚀 Car Price Prediction - Colab All-in-One Cell
 # Paste this cell into Colab, modify it for your needs - and run!
 !pip install scikit-learn pandas matplotlib seaborn --quiet
-
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split, RandomizedSearchCV
@@ -114,51 +118,42 @@ from sklearn.metrics import mean_squared_error, r2_score
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pickle
-
 # Sample data - Replace this with your own!
 data = {
-    'brand': ['Toyota', 'Honda', 'Ford', 'BMW'],
-    'model_year': [2015, 2018, 2012, 2020],
-    'mileage': [50000, 30000, 70000, 15000],
-    'transmission': ['automatic', 'manual', 'automatic', 'automatic'],
-    'fuel_type': ['petrol', 'diesel', 'petrol', 'hybrid'],
-    'owners': [1, 2, 1, 1],
-    'year_of_purchase': [2015, 2018, 2012, 2020],
-    'usage_duration': [5, 3, 8, 1],
-    'price': [15000, 12000, 8000, 30000]
+    `brand`: ['Toyota', 'Honda', 'Ford', 'BMW'],
+    `model_year`: [2015, 2018, 2012, 2020],
+    `mileage`: [50000, 30000, 70000, 15000],
+    `transmission`: ['automatic', 'manual', 'automatic', 'automatic'],
+    `fuel_type`: ['petrol', 'diesel', 'petrol', 'hybrid'],
+    `owners`: [1, 2, 1, 1],
+    `year_of_purchase`: [2015, 2018, 2012, 2020],
+    `usage_duration`: [5, 3, 8, 1],
+    `price`: [15000, 12000, 8000, 30000]
 }
-
 df = pd.DataFrame(data)
-
 # Feature Engineering
 df['price_per_year'] = df['price'] / df['usage_duration']
 df['age'] = 2024 - df['model_year']
-
 # One-hot encode categorical variables
 categorical_cols = ['brand', 'transmission', 'fuel_type']
 df = pd.get_dummies(df, columns=categorical_cols, drop_first=True)
-
 # Prepare features and target
 features = df.drop('price', axis=1)
 target = df['price']
-
 # Scale numerical features
 scaler = StandardScaler()
 num_cols = ['model_year', 'mileage', 'owners', 'year_of_purchase', 'usage_duration', 'price_per_year', 'age']
 features[num_cols] = scaler.fit_transform(features[num_cols])
-
 # Split data
 X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=0.2, random_state=42)
-
 # Train multiple models
 models = {
-    'Linear Regression': LinearRegression(),
-    'Ridge Regression': RidgeCV(alphas=[0.1, 1.0, 10.0]),
-    'Lasso Regression': LassoCV(alphas=[0.1, 1.0, 10.0]),
-    'Random Forest': RandomForestRegressor(n_estimators=100, random_state=42),
-    'Gradient Boosting': GradientBoostingRegressor(n_estimators=100, random_state=42)
+    `Linear Regression`: LinearRegression(),
+    `Ridge Regression`: RidgeCV(alphas=[0.1, 1.0, 10.0]),
+    `Lasso Regression`: LassoCV(alphas=[0.1, 1.0, 10.0]),
+    `Random Forest`: RandomForestRegressor(n_estimators=100, random_state=42),
+    `Gradient Boosting`: GradientBoostingRegressor(n_estimators=100, random_state=42)
 }
-
 results = {}
 for name, model in models.items():
     model.fit(X_train, y_train)
@@ -167,23 +162,19 @@ for name, model in models.items():
     r2 = r2_score(y_test, predictions)
     results[name] = {'MSE': mse, 'R2': r2}
     print(f\"Model: {name} - MSE: {mse:.2f}, R2 Score: {r2:.2f}\")
-
 # Hyperparameter tuning for Random Forest
 param_grid = {
-    'n_estimators': [100, 200, 500],
-    'max_depth': [None, 10, 20],
-    'min_samples_split': [2, 5, 10]
+    `n_estimators`: [100, 200, 500],
+    `max_depth`: [None, 10, 20],
+    `min_samples_split`: [2, 5, 10]
 }
-
 rf = RandomForestRegressor(random_state=42)
 random_search = RandomizedSearchCV(rf, param_distributions=param_grid, n_iter=10, cv=3, scoring='neg_mean_squared_error', random_state=42)
 random_search.fit(X_train, y_train)
-
 print(\"\\nBest hyperparameters:\", random_search.best_params_)
 best_rf = random_search.best_estimator_
 print(\"Best Random Forest - MSE:\", mean_squared_error(y_test, best_rf.predict(X_test)))
 print(\"Best Random Forest - R2 Score:\", r2_score(y_test, best_rf.predict(X_test)))
-
 # Feature importance analysis for Random Forest
 feature_importances = pd.Series(best_rf.feature_importances_, index=X_train.columns)
 plt.figure(figsize=(10, 6))
@@ -192,11 +183,9 @@ plt.title('Random Forest Feature Importance')
 plt.xlabel('Importance Score')
 plt.ylabel('Features')
 plt.show()
-
 # Save the best model
 with open('car_price_model.pkl', 'wb') as f:
     pickle.dump(best_rf, f)
-
 print('Model saved successfully! Paste your own data and re-run the cell to retrain and re-predict.');
 ";
 
@@ -207,6 +196,9 @@ print('Model saved successfully! Paste your own data and re-run the cell to retr
     };
 
     validateCarSpecs(carSpecs);
+
+    // Save uploaded photos alongside carSpecs
+    ignore carSpecs.photos;
 
     let currentPrice = calculateCurrentPrice(carSpecs);
     let futurePredictions = computeFuturePredictions(currentPrice, carSpecs);

@@ -1,12 +1,13 @@
 # Specification
 
 ## Summary
-**Goal:** Fix the broken hand gesture piano so that webcam hand tracking, audio playback, gesture recognition, and the piano UI all work correctly end-to-end.
+**Goal:** Add optional car photo upload functionality to the car price prediction form, persisting photos alongside prediction records and displaying them in prediction history.
 
 **Planned changes:**
-- Fix the WebcamFeed component so the camera feed displays live output, MediaPipe Hands initializes without errors, hand landmarks are detected and drawn on the canvas overlay, and gesture events propagate to the audio player.
-- Fix the `useAudioPlayer` hook so piano samples load correctly for all 25 keys (C4–C6), and the fallback oscillator activates automatically when samples are unavailable.
-- Fix the gesture recognition utility (`gestureRecognition.ts`) so landmark-to-note mapping works reliably for all 25 keys, notes do not fire continuously at rest, and the mapping is consistent with the visual keyboard layout.
-- Fix the `GesturePiano` component layout so the webcam feed, piano keyboard, and volume control all render correctly, active keys highlight in real time when gestures are detected, and the volume slider adjusts playback volume.
+- Add a photo upload dropzone/button to `PredictionForm.tsx` labeled "Add Car Photos (Optional)" supporting JPG, PNG, and WEBP files
+- Show inline thumbnail previews of selected photos within the form, with the ability to remove individual photos before submission
+- Update the Motoko backend (`main.mo`) to include an optional photos field (array of base64 text) in the prediction record type and update the save/predict function to accept and persist photo data
+- Update the prediction mutation hook (`useQueries.ts`) to pass the optional base64 photos array to the backend actor call
+- Update the prediction history view to display small photo thumbnails for entries that have associated photos, with no broken placeholder for entries without photos
 
-**User-visible outcome:** Users can open the gesture piano, see their webcam feed with hand landmark overlay, play notes by making hand gestures, see the corresponding keys highlighted on the piano keyboard, and adjust volume — all without errors.
+**User-visible outcome:** Users can optionally attach one or more car detail photos when submitting a price prediction. The photos are previewed before submission and displayed as thumbnails in prediction history entries.

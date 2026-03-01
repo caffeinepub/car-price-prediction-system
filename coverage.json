@@ -1,81 +1,74 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-26T05:42:36.385Z",
+  "generatedAt": "2026-03-01T04:00:10.227Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
     "total": 4,
-    "implemented": 4,
+    "implemented": 3,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Audit and fix the WebcamFeed component's hand tracking initialization: ensure MediaPipe Hands loads correctly, the camera feed starts properly, and gesture detection events fire and propagate to the audio player without errors.",
+        "summary": "Add a photo upload field to the car price prediction form (PredictionForm.tsx) that allows users to attach one or more car detail photos (e.g., exterior, interior, dashboard) before submitting for price prediction. The uploaded images should be previewed inline within the form before submission.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/WebcamFeed.tsx",
-          "frontend/src/hooks/useHandTracking.ts"
+          "frontend/src/components/PredictionForm.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/WebcamFeed.tsx",
-          "frontend/src/hooks/useHandTracking.ts"
+          "frontend/src/components/PredictionForm.tsx"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Audit and fix the useAudioPlayer hook to ensure piano sample files load successfully for the full C4–C6 range (25 keys). If sample files fail to load, the fallback oscillator synthesis must activate automatically so notes always play.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/hooks/useAudioPlayer.ts"
-        ],
-        "matchedFiles": [
-          "frontend/src/hooks/useAudioPlayer.ts"
-        ]
+        "summary": "Store uploaded car photo data (as base64-encoded blobs) alongside the car specification fields in the backend prediction record. Update the CarSpecs or prediction type in backend/main.mo to include an optional photos field (array of blob or text), and update the savePrediction / predictPrice backend function to accept and persist photo data.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
       },
       {
         "id": "REQ-3",
-        "summary": "Audit and fix the gesture recognition utility (gestureRecognition.ts) to ensure landmark-to-note mapping works correctly for all 25 keys (C4–C6). Verify that finger extension detection thresholds produce reliable note triggering for typical hand positions in front of a webcam.",
+        "summary": "Update the prediction history view to display thumbnail photos associated with each past prediction, if photos were provided at submission time.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/utils/gestureRecognition.ts"
+          "frontend/src/components/PredictionHistory.tsx",
+          "frontend/src/App.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/utils/gestureRecognition.ts"
+          "frontend/src/components/PredictionHistory.tsx",
+          "frontend/src/App.tsx"
         ]
       },
       {
         "id": "REQ-4",
-        "summary": "Audit and fix the GesturePiano component to ensure the webcam feed, piano keyboard, and volume control render correctly in the responsive grid layout, and that active note state updates are reflected visually on the PianoKeyboard component in real time.",
+        "summary": "Update the useQueries.ts mutation for car price prediction to pass the selected photo data (base64 strings array) to the backend actor call alongside existing car spec fields.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/GesturePiano.tsx",
-          "frontend/src/components/PianoKeyboard.tsx",
-          "frontend/src/components/VolumeControl.tsx"
+          "frontend/src/hooks/useQueries.ts"
         ],
         "matchedFiles": [
-          "frontend/src/components/GesturePiano.tsx",
-          "frontend/src/components/PianoKeyboard.tsx",
-          "frontend/src/components/VolumeControl.tsx"
+          "frontend/src/hooks/useQueries.ts"
         ]
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
+    "backend/migration.mo",
     "build-request.json",
-    "build-template/README.md",
-    "caffeine.lock.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/GesturePiano.tsx",
-    "frontend/src/components/PianoKeyboard.tsx",
-    "frontend/src/components/VolumeControl.tsx",
-    "frontend/src/components/WebcamFeed.tsx",
-    "frontend/src/hooks/useAudioPlayer.ts",
-    "frontend/src/hooks/useHandTracking.ts",
-    "frontend/src/utils/gestureRecognition.ts",
+    "frontend/src/App.tsx",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/components/PredictionForm.tsx",
+    "frontend/src/components/PredictionHistory.tsx",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
+    "frontend/src/hooks/useQueries.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

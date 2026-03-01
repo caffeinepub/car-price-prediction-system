@@ -1,52 +1,38 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-26T05:42:36.381Z",
-  "summary": "The diff implements fixes across WebcamFeed, useHandTracking, useAudioPlayer, gestureRecognition, GesturePiano, PianoKeyboard, and VolumeControl. All four requirements are at least partially addressed. REQ-1 is covered by the refactored WebcamFeed and useHandTracking hook with proper MediaPipe CDN loading, canvas drawing, and gesture propagation. REQ-2 is addressed by useAudioPlayer using pure oscillator-based synthesis with ADSR envelopes. REQ-3 is addressed by gestureRecognition.ts with 25-note mapping and finger extension thresholds. REQ-4 is addressed by GesturePiano's responsive grid layout with all three sub-sections. However, several specific acceptance criteria have concerns around sample loading fallback behavior and continuous note firing when hand is at rest.",
+  "generatedAt": "2026-03-01T04:00:10.224Z",
+  "summary": "The diff implements photo upload functionality for car price prediction across frontend and backend. REQ-1 (form photo upload with previews), REQ-3 (history thumbnails), and REQ-4 (mutation hook updates) appear well-implemented. REQ-2 has a notable concern: the backend uses ExternalBlob/Storage rather than base64-encoded text as required by the constraint, and the migration.mo uses Storage.ExternalBlob instead of ?[Text]. However, photo data is persisted and backwards-compatible. One hallucinated feature is detected: a migration module was added that was not requested.",
   "missing_requirements": [
     {
       "id": "REQ-2",
-      "requirement": "Piano sample files load successfully for the full C4-C6 range (25 keys); if sample files fail to load, the fallback oscillator synthesis must activate automatically.",
-      "reason": "The useAudioPlayer implementation never attempts to load piano sample files at all. isLoading and loadError states are hardcoded to false/null, indicating no sample loading logic exists. The AC implies a primary sample-loading path with automatic fallback, which is absent.",
+      "requirement": "Store uploaded car photo data as base64-encoded blobs using ?[Text] for base64 strings in the backend — no external storage services",
+      "reason": "The backend/main.mo defines photos as ?[Storage.ExternalBlob] and useQueries.ts converts files to ExternalBlob instances via ExternalBlob.fromBytes(). The constraint explicitly requires base64-encoded text (?[Text]) and forbids external storage services. The implementation appears to use a blob storage module (Storage.ExternalBlob / MixinStorage) rather than plain base64 text strings.",
       "evidence": [
-        "frontend/src/hooks/useAudioPlayer.ts"
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "requirement": "No notes fire continuously when the hand is at rest; each of the 25 notes can be triggered by a distinct, reachable hand gesture.",
-      "reason": "The debounce is purely time-based (80ms). If the hand remains stationary with 2+ fingers extended, the debounce expires and the same note re-fires indefinitely. There are no distinct gestures per note; all 25 notes are mapped solely by wrist X position in a continuous sweep.",
-      "evidence": [
-        "frontend/src/utils/gestureRecognition.ts"
+        "backend/main.mo",
+        "frontend/src/hooks/useQueries.ts",
+        "backend/migration.mo"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "FPS counter displayed in the WebcamFeed UI using a requestAnimationFrame loop.",
-      "reason": "The build request does not mention an FPS counter or any performance display widget. This is an unrequested extra UI element.",
+      "description": "A backend/migration.mo module was added to migrate existing prediction records from OldCarSpecs to NewCarSpecs (with photos=null for existing records).",
+      "reason": "No migration module was requested in the build request. The requirements only asked to update CarSpecs type and ensure backwards compatibility; an explicit Motoko migration module was not specified.",
       "evidence": [
-        "frontend/src/components/WebcamFeed.tsx"
-      ]
-    },
-    {
-      "description": "Mute/unmute toggle button on the VolumeControl component that toggles volume between 0 and 0.7 when the volume icon is clicked.",
-      "reason": "The build request only requires a volume slider that adjusts playback volume in real time. A dedicated mute toggle button was not requested.",
-      "evidence": [
-        "frontend/src/components/VolumeControl.tsx"
+        "backend/migration.mo"
       ]
     }
   ],
-  "confidence": 0.72,
+  "confidence": 0.78,
   "changed_files": [
+    "backend/main.mo",
+    "backend/migration.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/components/GesturePiano.tsx",
-    "frontend/src/components/PianoKeyboard.tsx",
-    "frontend/src/components/VolumeControl.tsx",
-    "frontend/src/components/WebcamFeed.tsx",
-    "frontend/src/hooks/useAudioPlayer.ts",
-    "frontend/src/hooks/useHandTracking.ts",
-    "frontend/src/utils/gestureRecognition.ts",
+    "frontend/src/App.tsx",
+    "frontend/src/components/PredictionForm.tsx",
+    "frontend/src/components/PredictionHistory.tsx",
+    "frontend/src/hooks/useQueries.ts",
     "project_state.json"
   ]
 }

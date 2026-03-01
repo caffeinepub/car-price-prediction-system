@@ -1,14 +1,14 @@
 {
-  "frontend/src/App.tsx": "Main application component with authentication flow, profile setup, and gesture piano interface integration with warm gradient theme and ThemeProvider.",
+  "frontend/src/App.tsx": "Main application component wiring the car price prediction UI — shows Hero + PredictionHistory + About for authenticated users, toggles to PredictionForm on CTA click, and handles login/profile-setup flows.",
   "frontend/src/components/Header.tsx": "Navigation header with gesture piano branding, music icon, and login/logout button with authentication state management.",
   "frontend/src/components/Hero.tsx": "Hero section component with ML-powered car price prediction branding, animated background, CTA buttons, hero image reference to /assets/generated/car-showroom-hero.dim_1200x600.jpg, and feature highlights.",
   "frontend/src/components/About.tsx": "About section displaying the car price prediction project overview, ML methodology, founder information (ASWIN S NAIR), contact email, and core technology features.",
   "frontend/src/components/Products.tsx": "Products showcase with a new \"Trending Dress\" section highlighting curated fashion items (streetwear hoodie, branded t-shirt, fashion accessories) with enhanced styling, followed by tabbed interface displaying food and fashion collections.",
   "frontend/src/components/Footer.tsx": "Footer component with copyright, caffeine.ai attribution with UTM tracking, and social media links on warm gradient background.",
-  "frontend/src/hooks/useQueries.ts": "React Query hooks for user profiles, contact info, car price prediction, and prediction history management with proper error handling.",
+  "frontend/src/hooks/useQueries.ts": "React Query hooks for user profiles, contact info, car price prediction (now accepts optional photo File[] array, converts them to ExternalBlob instances before sending to backend), and prediction history management.",
   "frontend/src/index.css": "Global styles with OKLCH color system featuring warm music theme (orange, yellow, pink, green gradients), custom animations (fade-in, pulse-glow), and responsive design tokens.",
   "frontend/tailwind.config.js": "Tailwind configuration extended with music theme colors (music-warm, music-glow, music-vibrant, music-accent), custom utilities, and animation curves for the gesture piano interface.",
-  "frontend/src/components/PredictionForm.tsx": "Comprehensive car price prediction form with 100+ car brands, input fields for vehicle details including new yearOfPurchase and usageDuration fields, ML-based price calculation with current value and future depreciation projections (1, 3, and 5 years) displayed in Indian Rupees (₹) with proper Indian number formatting, vehicle details summary showing purchase year and usage duration, and responsive results display with proper validation for all fields.",
+  "frontend/src/components/PredictionForm.tsx": "Comprehensive car price prediction form with all vehicle input fields plus a new \"Add Car Photos (Optional)\" section featuring a drag-and-drop dropzone, thumbnail grid preview with individual remove buttons, and photo display in the results panel after prediction.",
   "frontend/src/components/LoginForm.tsx": "Internet Identity login form with car price prediction branding and user-friendly authentication interface.",
   "frontend/src/components/ProfileSetup.tsx": "Profile setup form for new users to enter their name and email after first login.",
   "frontend/src/components/AdminDashboard.tsx": "Admin dashboard displaying active users, user activity statistics, login history, and comprehensive user management tables.",
@@ -33,5 +33,6 @@
   "frontend/src/components/PianoKeyboard.tsx": "Fixed piano keyboard layout with proper black key positioning, added active notes text display below the keyboard, and improved visual styling for active key highlights.",
   "frontend/src/components/VolumeControl.tsx": "Enhanced volume control with dynamic volume icon that changes based on level, and clickable icon to toggle mute/unmute.",
   "frontend/src/components/TutorialOverlay.tsx": "Tutorial modal overlay explaining hand gesture controls, positioning, and tips with hand guide image and dismissible interface.",
-  "frontend/src/hooks/useTutorialState.ts": "Custom hook managing tutorial visibility state with localStorage persistence to show tutorial only on first visit."
+  "frontend/src/hooks/useTutorialState.ts": "Custom hook managing tutorial visibility state with localStorage persistence to show tutorial only on first visit.",
+  "frontend/src/components/PredictionHistory.tsx": "Displays the user's prediction history in reverse-chronological order with car specs, predicted price, confidence score, and photo thumbnail; fixed TypeScript errors by replacing `in` operator checks with direct `TransmissionType`/`FuelType` enum value comparisons."
 }

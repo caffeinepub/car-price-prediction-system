@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
 import type { UserProfile, ApiContactInfo, CarSpecs, PricePredictionResult } from '../backend';
+import { ExternalBlob } from '../backend';
 import { toast } from 'sonner';
 
 // User Profile Queries
@@ -58,14 +59,41 @@ export function useGetApiContactInfo() {
   });
 }
 
-// Car Price Prediction
+// Car Price Prediction - accepts optional photo files to upload as ExternalBlob
+export interface PredictCarPriceInput {
+  carSpecs: Omit<CarSpecs, 'photos'>;
+  photoFiles?: File[];
+}
+
 export function usePredictCarPrice() {
   const { actor } = useActor();
+  const queryClient = useQueryClient();
 
-  return useMutation<PricePredictionResult, Error, CarSpecs>({
-    mutationFn: async (carSpecs: CarSpecs) => {
+  return useMutation<PricePredictionResult, Error, PredictCarPriceInput>({
+    mutationFn: async ({ carSpecs, photoFiles }: PredictCarPriceInput) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.predictCarPrice(carSpecs);
+
+      let photos: ExternalBlob[] | undefined = undefined;
+
+      if (photoFiles && photoFiles.length > 0) {
+        photos = await Promise.all(
+          photoFiles.map(async (file) => {
+            const arrayBuffer = await file.arrayBuffer();
+            const bytes = new Uint8Array(arrayBuffer);
+            return ExternalBlob.fromBytes(bytes);
+          })
+        );
+      }
+
+      const fullCarSpecs: CarSpecs = {
+        ...carSpecs,
+        photos: photos && photos.length > 0 ? photos : undefined,
+      };
+
+      return actor.predictCarPrice(fullCarSpecs);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['predictionHistory'] });
     },
     onError: (error) => {
       console.error('Failed to predict car price:', error);

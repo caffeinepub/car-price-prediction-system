@@ -23,8 +23,10 @@ export interface CarSpecs {
   'modelYear' : bigint,
   'brand' : string,
   'usageDuration' : bigint,
+  'photos' : [] | [Array<ExternalBlob>],
   'yearOfPurchase' : bigint,
 }
+export type ExternalBlob = Uint8Array;
 export type FuelType = { 'petrol' : null } |
   { 'hybrid' : null } |
   { 'diesel' : null } |

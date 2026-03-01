@@ -1,46 +1,54 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "New project",
+  "summary": "Car price prediction app with photo upload feature for price prediction.",
   "architectural_notes": [],
   "known_issues": [],
-  "isFixRequest": true,
+  "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-audit-and-fix-the-webcamfeed-component-s-hand-tracking-initialization-ensure-mediapipe-hands-loads-correctly-the-camera-feed-starts-properly-and-gesture-detection-events-fire-and-propagate-to-the-audio-player-without-errors",
-      "title": "Audit and fix the WebcamFeed component's hand tracking initialization: ensure MediaPipe Hands loads correctly, the camera feed starts properly, and gesture detection events fire and propagate to the audio player without errors.",
+      "id": "feature-add-a-photo-upload-field-to-the-car-price-prediction-form-predictionform-tsx-that-allows-users-to-attach-one-or-more-car-detail-photos-e-g-exterior-interior-dashboard-before-submitting-for-price-prediction-the-uploaded-images-should-be-previewed-inline-within-the-form-before-submission",
+      "title": "Add a photo upload field to the car price prediction form (PredictionForm.tsx) that allows users to attach one or more car detail photos (e.g., exterior, interior, dashboard) before submitting for price prediction. The uploaded images should be previewed inline within the form before submission.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-audit-and-fix-the-useaudioplayer-hook-to-ensure-piano-sample-files-load-successfully-for-the-full-c4-c6-range-25-keys-if-sample-files-fail-to-load-the-fallback-oscillator-synthesis-must-activate-automatically-so-notes-always-play",
-      "title": "Audit and fix the useAudioPlayer hook to ensure piano sample files load successfully for the full C4–C6 range (25 keys). If sample files fail to load, the fallback oscillator synthesis must activate automatically so notes always play.",
-      "reqIds": [
-        "REQ-2"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-audit-and-fix-the-gesture-recognition-utility-gesturerecognition-ts-to-ensure-landmark-to-note-mapping-works-correctly-for-all-25-keys-c4-c6-verify-that-finger-extension-detection-thresholds-produce-reliable-note-triggering-for-typical-hand-positions-in-front-of-a-webcam",
-      "title": "Audit and fix the gesture recognition utility (gestureRecognition.ts) to ensure landmark-to-note mapping works correctly for all 25 keys (C4–C6). Verify that finger extension detection thresholds produce reliable note triggering for typical hand positions in front of a webcam.",
+      "id": "feature-update-the-prediction-history-view-to-display-thumbnail-photos-associated-with-each-past-prediction-if-photos-were-provided-at-submission-time",
+      "title": "Update the prediction history view to display thumbnail photos associated with each past prediction, if photos were provided at submission time.",
       "reqIds": [
         "REQ-3"
       ],
       "version": 1
     },
     {
-      "id": "feature-audit-and-fix-the-gesturepiano-component-to-ensure-the-webcam-feed-piano-keyboard-and-volume-control-render-correctly-in-the-responsive-grid-layout-and-that-active-note-state-updates-are-reflected-visually-on-the-pianokeyboard-component-in-real-time",
-      "title": "Audit and fix the GesturePiano component to ensure the webcam feed, piano keyboard, and volume control render correctly in the responsive grid layout, and that active note state updates are reflected visually on the PianoKeyboard component in real time.",
+      "id": "feature-update-the-usequeries-ts-mutation-for-car-price-prediction-to-pass-the-selected-photo-data-base64-strings-array-to-the-backend-actor-call-alongside-existing-car-spec-fields",
+      "title": "Update the useQueries.ts mutation for car price prediction to pass the selected photo data (base64 strings array) to the backend actor call alongside existing car spec fields.",
       "reqIds": [
         "REQ-4"
       ],
       "version": 1
     }
   ],
-  "new_feature_requests": [],
-  "projectName": "Fix hand gesture piano functionality",
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Add photo upload feature to include car detail photos when predicting price",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Store uploaded car photo data (as base64-encoded blobs) alongside the car specification fields in the backend prediction record. Update the CarSpecs or prediction type in backend/main.mo to include an optional photos field (array of blob or text), and update the savePrediction / predictPrice backend function to accept and persist photo data.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "Car Price Prediction",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }
