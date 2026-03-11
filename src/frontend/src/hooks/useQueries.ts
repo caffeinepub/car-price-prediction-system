@@ -1,16 +1,16 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useActor } from './useActor';
-import type { UserProfile, ApiContactInfo, CarSpecs, PricePredictionResult } from '../backend';
-import { toast } from 'sonner';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import type { AttendanceRecord, CarSpecs, UserProfile } from "../backend";
+import { useActor } from "./useActor";
 
-// User Profile Queries
+// User Profile Hooks
 export function useGetCallerUserProfile() {
   const { actor, isFetching: actorFetching } = useActor();
 
   const query = useQuery<UserProfile | null>({
-    queryKey: ['currentUserProfile'],
+    queryKey: ["currentUserProfile"],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.getCallerUserProfile();
     },
     enabled: !!actor && !actorFetching,
@@ -30,60 +30,136 @@ export function useSaveCallerUserProfile() {
 
   return useMutation({
     mutationFn: async (profile: UserProfile) => {
-      if (!actor) throw new Error('Actor not available');
-      await actor.saveCallerUserProfile(profile);
+      if (!actor) throw new Error("Actor not available");
+      return actor.saveCallerUserProfile(profile);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
+      queryClient.invalidateQueries({ queryKey: ["currentUserProfile"] });
+      toast.success("Profile saved successfully!");
     },
-    onError: (error) => {
-      console.error('Failed to save profile:', error);
-      toast.error('Failed to save profile');
+    onError: (error: Error) => {
+      toast.error(`Failed to save profile: ${error.message}`);
     },
   });
 }
 
-// Contact Info Query (public)
-export function useGetApiContactInfo() {
-  const { actor, isFetching: actorFetching } = useActor();
+// Contact Info Hook
+export function useGetContactInfo() {
+  const { actor, isFetching } = useActor();
 
-  return useQuery<ApiContactInfo>({
-    queryKey: ['contactInfo'],
+  return useQuery({
+    queryKey: ["contactInfo"],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.getApiContactInfo();
+      if (!actor) return null;
+      return actor.getContactInfo();
     },
-    enabled: !!actor && !actorFetching,
-    staleTime: Infinity,
+    enabled: !!actor && !isFetching,
   });
 }
 
-// Car Price Prediction
+// Car Price Prediction Hook
 export function usePredictCarPrice() {
   const { actor } = useActor();
+  const queryClient = useQueryClient();
 
-  return useMutation<PricePredictionResult, Error, CarSpecs>({
+  return useMutation({
     mutationFn: async (carSpecs: CarSpecs) => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.predictCarPrice(carSpecs);
+      if (!actor) throw new Error("Actor not available");
+      return actor.predictCarPriceWithAdvancedFactors(carSpecs);
     },
-    onError: (error) => {
-      console.error('Failed to predict car price:', error);
-      toast.error('Failed to predict car price');
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["predictionHistory"] });
+      toast.success("Price prediction completed!");
+    },
+    onError: (error: Error) => {
+      toast.error(`Prediction failed: ${error.message}`);
     },
   });
 }
 
-// Prediction History
+// Prediction History Hook
 export function useGetPredictionHistory() {
-  const { actor, isFetching: actorFetching } = useActor();
+  const { actor, isFetching } = useActor();
 
-  return useQuery<Array<[CarSpecs, PricePredictionResult]>>({
-    queryKey: ['predictionHistory'],
+  return useQuery({
+    queryKey: ["predictionHistory"],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) return [];
       return actor.getPredictionHistory();
     },
-    enabled: !!actor && !actorFetching,
+    enabled: !!actor && !isFetching,
+  });
+}
+
+// Attendance Hooks
+
+export function useRegisterFace() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (name: string) => {
+      if (!actor) throw new Error("Actor not available");
+      return actor.registerFace(name);
+    },
+    onSuccess: (_data, name) => {
+      queryClient.invalidateQueries({ queryKey: ["attendanceRecords"] });
+      toast.success(`Face registered for "${name}"!`);
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to register face: ${error.message}`);
+    },
+  });
+}
+
+export function useMarkAttendance() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (name: string) => {
+      if (!actor) throw new Error("Actor not available");
+      return actor.markPresent(name);
+    },
+    onSuccess: (_data, name) => {
+      queryClient.invalidateQueries({ queryKey: ["attendanceRecords"] });
+      toast.success(`Attendance marked for "${name}"!`);
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to mark attendance: ${error.message}`);
+    },
+  });
+}
+
+export function useMarkLeaving() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (recordId: bigint) => {
+      if (!actor) throw new Error("Actor not available");
+      return actor.markLeaving(recordId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["attendanceRecords"] });
+      toast.success("Leaving time recorded!");
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to mark leaving: ${error.message}`);
+    },
+  });
+}
+
+export function useGetAttendanceRecords() {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<AttendanceRecord[]>({
+    queryKey: ["attendanceRecords"],
+    queryFn: async () => {
+      if (!actor) return [];
+      return actor.getAttendanceRecords();
+    },
+    enabled: !!actor && !isFetching,
+    refetchInterval: 10000,
   });
 }

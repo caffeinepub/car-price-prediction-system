@@ -1,9 +1,15 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { LogIn, Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Loader2, LogIn } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import { useInternetIdentity } from "../hooks/useInternetIdentity";
 
 export function LoginForm() {
   const { login, loginStatus } = useInternetIdentity();
@@ -13,25 +19,25 @@ export function LoginForm() {
     setIsLoading(true);
     try {
       await login();
-      toast.success('Successfully logged in!');
+      toast.success("Successfully logged in!");
     } catch (error: any) {
-      console.error('Login error:', error);
-      if (error.message === 'User is already authenticated') {
-        toast.error('Already authenticated. Please refresh the page.');
+      console.error("Login error:", error);
+      if (error.message === "User is already authenticated") {
+        toast.error("Already authenticated. Please refresh the page.");
       } else {
-        toast.error('Login failed. Please try again.');
+        toast.error("Login failed. Please try again.");
       }
     } finally {
       setIsLoading(false);
     }
   };
 
-  const disabled = loginStatus === 'logging-in' || isLoading;
+  const disabled = loginStatus === "logging-in" || isLoading;
 
   return (
     <section className="min-h-screen flex items-center justify-center px-4 pt-20">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5" />
-      
+
       <Card className="w-full max-w-md relative z-10 shadow-2xl border-primary/20">
         <CardHeader className="text-center space-y-2">
           <div className="mx-auto mb-4">
@@ -41,7 +47,9 @@ export function LoginForm() {
               className="w-48 h-24 mx-auto object-contain"
             />
           </div>
-          <CardTitle className="text-3xl font-bold">Car Price Predictor</CardTitle>
+          <CardTitle className="text-3xl font-bold">
+            Car Price Predictor
+          </CardTitle>
           <CardDescription className="text-base">
             Sign in with Internet Identity to access the prediction system
           </CardDescription>
@@ -84,7 +92,8 @@ export function LoginForm() {
 
           <div className="pt-6 border-t border-border">
             <p className="text-xs text-center text-muted-foreground">
-              By signing in, you agree to our Terms of Service and Privacy Policy
+              By signing in, you agree to our Terms of Service and Privacy
+              Policy
             </p>
           </div>
         </CardContent>

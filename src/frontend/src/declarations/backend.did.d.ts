@@ -15,20 +15,41 @@ export interface Adjustments {
   'purchaseYearAdjustment' : number,
 }
 export interface ApiContactInfo { 'founder' : string, 'contactEmail' : string }
+export interface AttendanceRecord {
+  'id' : bigint,
+  'status' : AttendanceStatus,
+  'leavingTime' : [] | [Time],
+  'name' : string,
+  'presentTime' : [] | [Time],
+}
+export type AttendanceStatus = { 'present' : null } |
+  { 'late' : null } |
+  { 'absent' : null };
 export interface CarSpecs {
+  'purchasePrice' : [] | [number],
   'mileage' : bigint,
   'owners' : bigint,
+  'insuranceDetails' : [] | [InsuranceInfo],
   'transmission' : TransmissionType,
   'fuelType' : FuelType,
   'modelYear' : bigint,
   'brand' : string,
   'usageDuration' : bigint,
+  'serviceHistory' : [] | [ServiceHistory],
+  'location' : [] | [string],
+  'photos' : [] | [Array<ExternalBlob>],
   'yearOfPurchase' : bigint,
 }
+export type ExternalBlob = Uint8Array;
 export type FuelType = { 'petrol' : null } |
   { 'hybrid' : null } |
   { 'diesel' : null } |
   { 'electric' : null };
+export interface InsuranceInfo {
+  'provider' : string,
+  'expirationDate' : Time,
+  'policyNumber' : string,
+}
 export interface PriceBreakdown {
   'fuelTypeAdjustment' : number,
   'baseValue' : number,
@@ -43,15 +64,34 @@ export interface PriceEstimate {
   'price' : number,
   'confidence' : number,
 }
+export interface PriceFactors {
+  'mileageImpact' : number,
+  'fuelTypePremium' : number,
+  'brandTierWeight' : number,
+  'transmissionFactor' : number,
+  'yearDepreciation' : number,
+}
 export interface PricePredictionResult {
   'currentPrice' : PriceEstimate,
   'predictionsByYear' : Array<YearlyPrediction>,
   'detailedBreakdown' : PriceBreakdown,
   'confidenceScore' : number,
   'adjustments' : Adjustments,
+  'priceFactors' : PriceFactors,
   'futurePredictions' : Array<TimePrediction>,
+  'recommendationScore' : number,
 }
 export interface Range { 'low' : number, 'high' : number }
+export interface ServiceHistory {
+  'serviceRecords' : [] | [Array<ServiceRecord>],
+  'lastServiceDate' : [] | [Time],
+}
+export interface ServiceRecord {
+  'cost' : number,
+  'date' : Time,
+  'description' : string,
+}
+export type Time = bigint;
 export interface TimePrediction {
   'depreciationRate' : number,
   'priceEstimate' : PriceEstimate,
@@ -104,6 +144,7 @@ export interface _SERVICE {
   'assignRole' : ActorMethod<[Principal, UserRole], undefined>,
   'checkSystemStatus' : ActorMethod<[], string>,
   'getApiContactInfo' : ActorMethod<[], ApiContactInfo>,
+  'getAttendanceRecords' : ActorMethod<[], Array<AttendanceRecord>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getContactInfo' : ActorMethod<[], ApiContactInfo>,
@@ -118,7 +159,13 @@ export interface _SERVICE {
   'isSubscriptionActive' : ActorMethod<[string], boolean>,
   'login' : ActorMethod<[string], string>,
   'logout' : ActorMethod<[], string>,
-  'predictCarPrice' : ActorMethod<[CarSpecs], PricePredictionResult>,
+  'markLeaving' : ActorMethod<[bigint], undefined>,
+  'markPresent' : ActorMethod<[string], undefined>,
+  'predictCarPriceWithAdvancedFactors' : ActorMethod<
+    [CarSpecs],
+    PricePredictionResult
+  >,
+  'registerFace' : ActorMethod<[string], undefined>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
 }
 export declare const idlService: IDL.ServiceClass;

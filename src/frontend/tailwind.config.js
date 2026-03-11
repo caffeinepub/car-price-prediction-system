@@ -65,7 +65,11 @@ export default {
                     'accent-foreground': 'oklch(var(--sidebar-accent-foreground))',
                     border: 'oklch(var(--sidebar-border))',
                     ring: 'oklch(var(--sidebar-ring))'
-                }
+                },
+                'music-warm': 'oklch(var(--music-warm))',
+                'music-glow': 'oklch(var(--music-glow))',
+                'music-vibrant': 'oklch(var(--music-vibrant))',
+                'music-accent': 'oklch(var(--music-accent))'
             },
             borderRadius: {
                 lg: 'var(--radius)',
